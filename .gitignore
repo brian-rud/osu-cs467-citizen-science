@@ -102,3 +102,12 @@ dist
 
 # TernJS port file
 .tern-port
+
+# Python virtual environment
+venv/
+
+# Python byte-compiled files
+__pycache__/
+
+# VS code project workspace settings
+.vscode/
