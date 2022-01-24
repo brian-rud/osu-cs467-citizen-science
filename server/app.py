@@ -43,5 +43,25 @@ def register():
         else:
             return jsonify({'error': 'Data must be JSON formatted!'})
 
+
+@app.route('/projects/create/<teacher_id>', methods=['POST'])
+def create_project(teacher_id):
+    if request.method == 'POST':
+        if request.is_json:
+            new_project = ProjectsModel(
+                teacher_id=teacher_id,
+                project_code=request.json['project_code'],
+                title=request.json['title'],
+                description=request.json['description'],
+                prompt=request.json['prompt'],
+                category=request.json['category'],
+                end_date=request.json['end_date']
+            )
+            db.session.add(new_project)
+            db.session.commit()
+            return project_schema.jsonify(new_project)
+        else:
+            return jsonify({'error': 'Data must be JSON formatted!'})
+
 if __name__ == '__main__':
     app.run(debug=True)
