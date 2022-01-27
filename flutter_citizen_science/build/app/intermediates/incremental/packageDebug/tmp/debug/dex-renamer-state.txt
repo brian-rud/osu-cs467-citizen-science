@@ -1,0 +1,4 @@
+#Thu Jan 27 16:16:47 EST 2022
+base.0=C\:\\Users\\bftw2\\Documents\\osu-cs467-citizen-science\\flutter_citizen_science\\build\\app\\intermediates\\dex\\debug\\mergeDexDebug\\classes.dex
+renamed.0=classes.dex
+path.0=classes.dex
