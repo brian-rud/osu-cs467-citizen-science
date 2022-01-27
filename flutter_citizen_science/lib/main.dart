@@ -2,28 +2,18 @@ import 'package:flutter/material.dart';
 
 void main() => (runApp(const CitizenScienceApp()));
 
-// home input page
-
 class CitizenScienceApp extends StatelessWidget {
   const CitizenScienceApp({Key? key}) : super(key: key);
 
-  final String _title = 'Citizen Science App';
-
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: _title,
-      home: Scaffold(
-        appBar: AppBar(
-          title: Center(child: Text(_title)),
-          backgroundColor: Colors.black,
-        ),
-        body: const ClassCodeInput(),
-        backgroundColor: Colors.lightGreenAccent,
-      ),
+    return const MaterialApp(
+      home: CodeInputScreen(),
     );
   }
 }
+
+// home input page
 
 class CodeInputScreen extends StatelessWidget {
   const CodeInputScreen({Key? key}) : super(key: key);
@@ -32,7 +22,14 @@ class CodeInputScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Scaffold(
+      appBar: AppBar(
+        title: Center(child: Text(_title)),
+        backgroundColor: Colors.black,
+      ),
+      body: const ClassCodeInput(),
+      backgroundColor: Colors.lightGreenAccent,
+    );
   }
 }
 
@@ -104,7 +101,11 @@ class _ClassCodeInputState extends State<ClassCodeInput> {
               child: const Text(
                 'Submit',
               ),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  return const ClassDetailsScreen();
+                }));
+              },
               style: ButtonStyle(
                 textStyle:
                     MaterialStateProperty.all(const TextStyle(fontSize: 20)),
@@ -120,8 +121,31 @@ class _ClassCodeInputState extends State<ClassCodeInput> {
 
 // class details page
 
+class ClassDetailsScreen extends StatelessWidget {
+  const ClassDetailsScreen({Key? key}) : super(key: key);
 
+  final String _title = 'Citizen Science App';
 
-
-
-
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Center(child: Text(_title)),
+        backgroundColor: Colors.black,
+      ),
+      body: Center(
+        child: ElevatedButton(
+          child: const Text('Back'),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          style: ButtonStyle(
+            textStyle: MaterialStateProperty.all(const TextStyle(fontSize: 20)),
+            backgroundColor: MaterialStateProperty.all(Colors.black),
+          ),
+        ),
+      ),
+      backgroundColor: Colors.lightGreenAccent,
+    );
+  }
+}
