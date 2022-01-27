@@ -149,3 +149,11 @@ class ClassDetailsScreen extends StatelessWidget {
     );
   }
 }
+
+// class details page
+
+
+
+
+
+
