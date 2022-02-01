@@ -59,7 +59,7 @@ class _ClassCodeInputState extends State<ClassCodeInput> {
         1,
         1111,
         'Example Project',
-        'Example Product Description',
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut placerat orci nulla pellentesque dignissim. Sollicitudin nibh sit amet commodo nulla facilisi nullam. Ipsum dolor sit amet consectetur adipiscing elit pellentesque habitant morbi. Aliquam sem et tortor consequat id porta nibh. Orci phasellus egestas tellus rutrum tellus. Ornare arcu odio ut sem nulla pharetra diam sit. Ut aliquam purus sit amet luctus venenatis lectus magna. Cursus metus aliquam eleifend mi in nulla. Aliquam purus sit amet luctus venenatis lectus magna. Orci dapibus ultrices in iaculis nunc sed. Quis varius quam quisque id diam vel quam elementum. Egestas sed sed risus pretium quam vulputate dignissim suspendisse. A scelerisque purus semper eget duis at tellus. Phasellus egestas tellus rutrum tellus pellentesque eu tincidunt. Proin sagittis nisl rhoncus mattis rhoncus urna neque viverra. Tempor nec feugiat nisl pretium fusce id velit ut.',
         'Example Project Prompt',
         'Science',
         DateTime.utc(2023, 11, 9));
@@ -128,7 +128,6 @@ class _ClassCodeInputState extends State<ClassCodeInput> {
               onPressed: () {
                 Navigator.push(context, MaterialPageRoute(builder: (context) {
                   ProjectObj currentProject = _getProjectObject();
-                  print(currentProject.getProjectTitle);
                   return ClassDetailsScreen(currentProject);
                 }));
               },
