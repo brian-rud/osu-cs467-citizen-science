@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_citizen_science/modules/project_observations.dart';
+import 'package:flutter_citizen_science/modules/user_observations_obj.dart';
 import 'project_observations.dart';
-import 'projectObj.dart';
+import 'project_obj.dart';
 // class details page
 
 class ClassDetailsScreen extends StatelessWidget {
-  const ClassDetailsScreen(this._currentProject, {Key? key}) : super(key: key);
+  const ClassDetailsScreen(this._currentProject, this._currentUser, {Key? key})
+      : super(key: key);
 
   final String _title = 'Citizen Science App';
 
   final ProjectObj _currentProject;
+
+  final UserSpecificObservationsObj _currentUser;
 
   @override
   Widget build(BuildContext context) {
@@ -18,16 +22,19 @@ class ClassDetailsScreen extends StatelessWidget {
         title: Center(child: Text(_title)),
         backgroundColor: Colors.black,
       ),
-      body: ClassDetailsBody(_currentProject),
+      body: ClassDetailsBody(_currentProject, _currentUser),
       backgroundColor: Colors.lightGreenAccent,
     );
   }
 }
 
 class ClassDetailsBody extends StatelessWidget {
-  const ClassDetailsBody(this._currentProject, {Key? key}) : super(key: key);
+  const ClassDetailsBody(this._currentProject, this._currentUser, {Key? key})
+      : super(key: key);
 
   final ProjectObj _currentProject;
+
+  final UserSpecificObservationsObj _currentUser;
 
   @override
   Widget build(BuildContext context) {
@@ -94,7 +101,7 @@ class ClassDetailsBody extends StatelessWidget {
                 ),
                 onPressed: () {
                   Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return ObservationsScreen(_currentProject);
+                    return ObservationsScreen(_currentProject, _currentUser);
                   }));
                 },
                 style: ButtonStyle(
