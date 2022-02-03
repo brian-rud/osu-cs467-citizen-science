@@ -9,9 +9,7 @@ from flask_marshmallow import Marshmallow
 load_dotenv(find_dotenv())
 
 app = Flask(__name__)
-env_config = os.getenv('APP_SETTINGS', 'config.DevelopmentConfig')
-app.config.from_object(env_config)
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config.from_object(os.getenv('APP_SETTINGS', 'config.DevelopmentConfig'))
 
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
