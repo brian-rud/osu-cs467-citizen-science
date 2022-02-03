@@ -1,0 +1,5 @@
+{
+    "domain": "dev-torz4vgb.us.auth0.com",
+    "client_id": "v9FOIwdBP9OGM84dAffzMVcC9olqiGUE",
+    "redirect_uri": "http://localhost:8080/callback"
+}
