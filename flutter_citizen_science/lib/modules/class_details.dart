@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_citizen_science/modules/class_input_screen.dart';
 import 'package:flutter_citizen_science/modules/project_observations.dart';
 import 'package:flutter_citizen_science/modules/user_observations_obj.dart';
 import 'project_observations.dart';
@@ -21,6 +22,15 @@ class ClassDetailsScreen extends StatelessWidget {
       appBar: AppBar(
         title: Center(child: Text(_title)),
         backgroundColor: Colors.black,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          tooltip: 'Back to Observations Screen',
+          onPressed: () {
+            Navigator.push(context, MaterialPageRoute(builder: (context) {
+              return const CodeInputScreen();
+            }));
+          },
+        ),
       ),
       body: ClassDetailsBody(_currentProject, _currentUser),
       backgroundColor: Colors.lightGreenAccent,

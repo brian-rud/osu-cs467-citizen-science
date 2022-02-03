@@ -1,29 +1,59 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_citizen_science/modules/class_details.dart';
+import 'package:flutter_citizen_science/modules/create_observation_screen.dart';
 import 'package:flutter_citizen_science/modules/user_observations_obj.dart';
 import 'project_obj.dart';
+import 'create_observation_screen.dart';
 
 // observations page
 
-class ObservationsScreen extends StatelessWidget {
+class ObservationsScreen extends StatefulWidget {
   const ObservationsScreen(this._currentProject, this._currentUser, {Key? key})
       : super(key: key);
-
-  final String _title = 'Citizen Science App';
 
   final ProjectObj _currentProject;
 
   final UserSpecificObservationsObj _currentUser;
 
   @override
+  State<ObservationsScreen> createState() => _ObservationsScreenState();
+}
+
+class _ObservationsScreenState extends State<ObservationsScreen> {
+  final String _title = 'Citizen Science App';
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Center(child: Text(_title)),
-        backgroundColor: Colors.black,
-      ),
-      body: ObservationView(_currentProject, _currentUser),
-      backgroundColor: Colors.lightGreenAccent,
-    );
+        appBar: AppBar(
+          title: Center(child: Text(_title)),
+          backgroundColor: Colors.black,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            tooltip: 'Back to Observations Screen',
+            onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return ClassDetailsScreen(
+                    widget._currentProject, widget._currentUser);
+              }));
+            },
+          ),
+        ),
+        body: ObservationView(widget._currentProject, widget._currentUser),
+        backgroundColor: Colors.lightGreenAccent,
+        floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+        floatingActionButton: FloatingActionButton(
+            // isExtended: true,
+            child: const Icon(Icons.add),
+            backgroundColor: Colors.green,
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => CreateObservationScreen(
+                        widget._currentProject, widget._currentUser),
+                  ));
+            }));
   }
 }
 

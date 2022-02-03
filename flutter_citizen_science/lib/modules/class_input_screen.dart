@@ -21,6 +21,24 @@ class CodeInputScreen extends StatelessWidget {
         title: Center(child: Text(_title)),
         backgroundColor: Colors.black,
       ),
+      drawer: ListView(
+        padding: EdgeInsets.zero,
+        children: [
+          const DrawerHeader(
+              decoration: BoxDecoration(
+                color: Colors.black,
+              ),
+              child: Text('Citizen Science App for Kids')),
+          ListTile(
+            title: const Text('About'),
+            tileColor: Colors.white,
+            onTap: () {
+              // Update the state of the app.
+              Navigator.pop(context);
+            },
+          ),
+        ],
+      ),
       body: const ClassCodeInput(),
       backgroundColor: Colors.lightGreenAccent,
     );
@@ -213,7 +231,6 @@ class _ClassCodeInputState extends State<ClassCodeInput> {
                     Observation(1, 'My First Observation'),
                     Observation(2, 'My Second Observation'),
                   ]);
-                  print(currentUser.getUserID);
                   return ClassDetailsScreen(currentProject, currentUser);
                 }));
               },
