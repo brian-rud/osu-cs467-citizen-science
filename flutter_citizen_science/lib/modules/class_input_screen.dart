@@ -210,8 +210,8 @@ class _ClassCodeInputState extends State<ClassCodeInput> {
                   UserSpecificObservationsObj currentUser =
                       UserSpecificObservationsObj(
                           _deviceData['id'], currentProject.getProjectID, [
-                    Observation('My First Observation'),
-                    Observation('My Second Observation'),
+                    Observation(1, 'My First Observation'),
+                    Observation(2, 'My Second Observation'),
                   ]);
                   print(currentUser.getUserID);
                   return ClassDetailsScreen(currentProject, currentUser);

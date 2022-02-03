@@ -24,9 +24,14 @@ class UserSpecificObservationsObj {
 // observations object
 
 class Observation {
+  int observationID;
   String? observationName;
 
-  Observation(this.observationName);
+  Observation(this.observationID, this.observationName);
+
+  int? get getObservationID {
+    return observationID;
+  }
 
   String get getObservationName {
     return '$observationName';
