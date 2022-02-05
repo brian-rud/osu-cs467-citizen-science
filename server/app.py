@@ -9,7 +9,7 @@ from flask_marshmallow import Marshmallow
 load_dotenv(find_dotenv())
 
 app = Flask(__name__)
-app.config.from_envvar('APP_SETTINGS')
+app.config.from_object(os.getenv('APP_SETTINGS', 'config.DevelopmentConfig'))
 
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
