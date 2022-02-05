@@ -10,7 +10,7 @@ from .config_app import *
 load_dotenv(find_dotenv())
 
 app = Flask(__name__)
-app.config.from_object(os.getenv('APP_SETTINGS', '.config_app.DevelopmentConfig'))
+app.config.from_object(os.getenv('APP_SETTINGS', 'config_app.DevelopmentConfig'))
 
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
