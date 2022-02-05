@@ -18,6 +18,12 @@ from models import *
 from schemas import *
 
 
+@app.route('/', methods=['GET'])
+def index():
+
+    return 'Hello World!'
+
+
 # Returns a list of projects for teacher with id <teacher_id>
 @app.route('/projects/<int:teacher_id>', methods=['GET'])
 def get_projects(teacher_id):
