@@ -15,8 +15,8 @@ app = Flask(__name__)
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
 
-from models import *
-from schemas import *
+# from models import *
+# from schemas import *
 
 
 @app.route('/', methods=['GET'])
