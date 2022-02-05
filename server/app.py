@@ -4,7 +4,7 @@ from dotenv import load_dotenv, find_dotenv
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
-from config_app import *
+from server.config_app import *
 
 
 load_dotenv(find_dotenv())
