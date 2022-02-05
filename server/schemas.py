@@ -1,4 +1,4 @@
-from app import ma
+from .app import ma
 
 
 class ProjectSchema(ma.Schema):
