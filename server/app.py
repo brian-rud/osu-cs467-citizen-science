@@ -4,13 +4,13 @@ from dotenv import load_dotenv, find_dotenv
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
-from server.config_app import *
+# from server.config_app import *
 
 
 load_dotenv(find_dotenv())
 
 app = Flask(__name__)
-app.config.from_object(os.getenv('APP_SETTINGS', 'config.DevelopmentConfig'))
+# app.config.from_object(os.getenv('APP_SETTINGS', 'config.DevelopmentConfig'))
 
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
