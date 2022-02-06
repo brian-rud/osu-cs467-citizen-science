@@ -87,7 +87,7 @@
         },
         methods: {
             submit: function () {
-                let url = `${process.env.VUE_APP_API_URL}/projects/create/${this.$auth.user.value.sub}`;//"http://localhost:5000" + "/projects/create/" + this.$auth.user.value.sub;
+                let url = `${process.env.VUE_APP_API_URL}/projects/create/${this.$auth.user.value.sub}`;
                 let payload = {
                     title: this.projectTitle,
                     description: this.projectDescription,

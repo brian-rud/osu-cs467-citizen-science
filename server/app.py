@@ -9,7 +9,7 @@ from flask_cors import CORS
 
 load_dotenv(find_dotenv())
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='../admin_frontend/dist/', static_url_path='/')
 app.config.from_object(os.getenv('APP_SETTINGS', 'config.DevelopmentConfig'))
 
 db = SQLAlchemy(app)
@@ -23,7 +23,7 @@ from .schemas import *
 @app.route('/', methods=['GET'])
 def index():
 
-    return 'Hello World!'
+    return app.send_static_file('index.html')
 
 
 # Returns a list of projects for teacher with id <teacher_id>
