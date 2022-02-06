@@ -37,6 +37,12 @@ const routes = [
     component: Projects,
     beforeEnter: routeGuard
   },
+  {
+    path: '/project/:id',
+    name: 'Project',
+    component: About,
+    beforeEnter: routeGuard
+  },
 
   {
     path: '/new_project',
