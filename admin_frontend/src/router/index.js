@@ -3,6 +3,7 @@ import Home from '@/views/Home'
 import About from '@/views/About'
 import Projects from '@/views/Projects'
 import NewProject from '@/views/NewProject'
+import SingleProject from '@/views/SingleProject'
 
 import Callback from '@/views/Callback'
 import ErrorPage from '@/views/Error'
@@ -40,8 +41,9 @@ const routes = [
   {
     path: '/project/:id',
     name: 'Project',
-    component: About,
-    beforeEnter: routeGuard
+    component: SingleProject,
+    beforeEnter: routeGuard,
+    props: true
   },
 
   {
