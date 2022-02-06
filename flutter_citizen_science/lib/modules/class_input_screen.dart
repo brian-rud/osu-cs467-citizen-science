@@ -63,7 +63,6 @@ class _ClassCodeInputState extends State<ClassCodeInput> {
     super.initState();
     initPlatformState();
     // Start listening to changes.
-    _classCode.addListener(_printLatestValue);
   }
 
   @override
@@ -145,10 +144,6 @@ class _ClassCodeInputState extends State<ClassCodeInput> {
     };
   }
 
-  void _printLatestValue() {
-    print('Second text field: ${_classCode.text}');
-  }
-
   ProjectObj _getProjectObject() {
     // sample object currently, will build error catching with http request
     ProjectObj currentProject = ProjectObj(
@@ -227,10 +222,7 @@ class _ClassCodeInputState extends State<ClassCodeInput> {
                   ProjectObj currentProject = _getProjectObject();
                   UserSpecificObservationsObj currentUser =
                       UserSpecificObservationsObj(
-                          _deviceData['id'], currentProject.getProjectID, [
-                    Observation(1, 'My First Observation'),
-                    Observation(2, 'My Second Observation'),
-                  ]);
+                          _deviceData['id'], currentProject.getProjectID, []);
                   return ClassDetailsScreen(currentProject, currentUser);
                 }));
               },
