@@ -4,15 +4,17 @@ from dotenv import load_dotenv, find_dotenv
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
+from flask_cors import CORS
 
 
 load_dotenv(find_dotenv())
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='../admin_frontend/dist/', static_url_path='/')
 app.config.from_object(os.getenv('APP_SETTINGS', 'config.DevelopmentConfig'))
 
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
+CORS(app)
 
 from .models import *
 from .schemas import *
@@ -21,11 +23,11 @@ from .schemas import *
 @app.route('/', methods=['GET'])
 def index():
 
-    return 'Hello World!'
+    return app.send_static_file('index.html')
 
 
 # Returns a list of projects for teacher with id <teacher_id>
-@app.route('/projects/<int:teacher_id>', methods=['GET'])
+@app.route('/projects/<teacher_id>', methods=['GET'])
 def get_projects(teacher_id):
     projects = Project.query.filter(Project.teacher_id == teacher_id)
 
@@ -93,7 +95,7 @@ def create_dv_info(request):
 
 
 # Creates a new project for teacher with id <teacher_id>
-@app.route('/projects/create/<int:teacher_id>', methods=['POST'])
+@app.route('/projects/create/<teacher_id>', methods=['POST', 'OPTIONS'])
 def create_project(teacher_id):
     if request.is_json:
         new_project = Project(
