@@ -9,7 +9,9 @@ from flask_cors import CORS
 
 load_dotenv(find_dotenv())
 
-app = Flask(__name__, static_folder='../admin_frontend/dist/', static_url_path='/')
+app = Flask(
+    __name__, static_folder='../admin_frontend/dist/', static_url_path='/'
+)
 app.config.from_object(os.getenv('APP_SETTINGS', 'config.DevelopmentConfig'))
 
 db = SQLAlchemy(app)
@@ -20,8 +22,10 @@ from .models import *
 from .schemas import *
 
 
-@app.route('/', methods=['GET'])
-def index():
+@app.route('/', defaults={'path': ''})
+@app.route('/<string:path>')
+@app.route('/<path:path>')
+def catch_all(path):
 
     return app.send_static_file('index.html')
 
@@ -35,8 +39,8 @@ def get_projects(teacher_id):
 
 
 # Returns info for project with id <project_id>
-@app.route('/projects/info/<int:project_id>', methods=['GET'])
-def get_project(project_id):
+@app.route('/projects/info/<project_id>', methods=['GET'])
+def get_project_by_id(project_id):
     project_info = db.session.query(Project, IVInfo, DVInfo) \
                    .join(IVInfo, IVInfo.iv_info_id == Project.iv_info_id) \
                    .join(DVInfo, DVInfo.dv_info_id == Project.dv_info_id) \
@@ -46,16 +50,17 @@ def get_project(project_id):
 
 
 # Updates project with id <project_id>
-@app.route('/projects/info/<int:project_id>', methods=['PUT'])
+@app.route('/projects/info/<project_id>', methods=['PUT'])
 def update_project(project_id):
-    db.session.query(Project).filter_by(project_id=project_id).update(request.json)
+    db.session.query(Project).filter_by(
+        project_id=project_id).update(request.json)
     db.session.commit()
 
     return project_schema.jsonify(Project.query.get(project_id))
 
 
 # Deletes project with id <project_id>
-@app.route('/projects/info/<int:project_id>', methods=['DELETE'])
+@app.route('/projects/info/<project_id>', methods=['DELETE'])
 def delete_project(project_id):
     project = Project.query.get(project_id)
     db.session.delete(project)
@@ -120,6 +125,74 @@ def create_project(teacher_id):
         return project_schema.jsonify(new_project)
     else:
         return jsonify(error='Data must be JSON formatted!')
+
+
+# Returns info for project with code <project_code>
+@app.route('/field_app/<project_code>', methods=['GET'])
+def get_project_by_code(project_code):
+    project_info = db.session.query(Project, IVInfo, DVInfo) \
+                   .join(IVInfo, IVInfo.iv_info_id == Project.iv_info_id) \
+                   .join(DVInfo, DVInfo.dv_info_id == Project.dv_info_id) \
+                   .filter(Project.project_code == project_code).one()
+
+    return projects_schema.jsonify(project_info)
+
+
+# Adds an observation to project with code <project_code>
+# for student device with id <device_id>
+@app.route('/field_app/<project_code>/<device_id>', methods=['POST'])
+def create_obs(project_code, device_id):
+    if request.is_json:
+        project = Project.query.filter(
+            Project.project_code == project_code).one()
+        new_obs = Observation(
+            project_id=project.project_id,
+            device_id=device_id,
+            obs_vals=request.json['obs_vals'],
+            obs_date=date.today()
+        )
+
+        db.session.add(new_obs)
+        db.session.commit()
+
+        return observation_schema.jsonify(new_obs)
+    else:
+        return jsonify(error='Data must be JSON formatted!')
+
+
+# Returns a list of observations already made by student device
+# with id <device_id> to project with project code <project_code>
+@app.route('/field_app/<project_code>/<device_id>', methods=['GET'])
+def get_obs(project_code, device_id):
+    project = Project.query.filter(Project.project_code == project_code).one()
+    observations = Observation.query.filter(
+        Observation.project_id == project.project_id and
+        Observation.device_id == device_id
+    )
+
+    return observations_schema.jsonify(observations)
+
+
+# Updates observation with id <obs_id>
+@app.route('/field_app/<int:obs_id>', methods=['PUT'])
+def update_obs(obs_id):
+    db.session.query(Observation).filter_by(obs_id=obs_id).update(request.json)
+    observation = Observation.query.get(obs_id)
+    observation.obs_date = date.today()
+    db.session.commit()
+
+    return observation_schema.jsonify(observation)
+
+
+# Deletes observation with id <obs_id>
+@app.route('/field_app/<int:obs_id>', methods=['DELETE'])
+def delete_obs(obs_id):
+    observation = Observation.query.get(obs_id)
+    db.session.delete(observation)
+    db.session.commit()
+
+    return observation_schema.jsonify(observation)
+
 
 if __name__ == '__main__':
     app.run()
