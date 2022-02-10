@@ -20,8 +20,15 @@ class Project(db.Model):
         db.Integer, db.ForeignKey('dvinfo.dv_info_id', ondelete='CASCADE')
     )
 
-    iv_info = db.relationship('IVInfo', cascade='all, delete')
-    dv_info = db.relationship('DVInfo', cascade='all, delete')
+    iv_info = db.relationship(
+        'IVInfo', backref='parent', cascade='all, delete'
+    )
+    dv_info = db.relationship(
+        'DVInfo', backref='parent', cascade='all, delete'
+    )
+    observation = db.relationship(
+        'Observation', backref='parent', cascade='all, delete'
+    )
 
     def __init__(self, teacher_id, project_code, title, description,
                  prompt, category, end_date, iv_info_id, dv_info_id):
@@ -81,12 +88,12 @@ class Observation(db.Model):
     __tablename__ = 'observations'
 
     obs_id = db.Column(db.Integer, primary_key=True)
-    project_id = db.Column(db.Integer, db.ForeignKey('projects.project_id'))
+    project_id = db.Column(
+        db.Integer, db.ForeignKey('projects.project_id', ondelete='CASCADE')
+    )
     device_id = db.Column(db.String(), nullable=False)
     obs_vals = db.Column(JSON, nullable=False)
     obs_date = db.Column(db.Date(), nullable=False)
-
-    projects = db.relationship('Project')
 
     def __init__(self, project_id, device_id, obs_vals, obs_date):
         self.project_id = project_id
