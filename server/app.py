@@ -1,10 +1,12 @@
+import csv
+import io
 import os
 from datetime import date
-from dotenv import load_dotenv, find_dotenv
-from flask import Flask, request, jsonify
-from flask_sqlalchemy import SQLAlchemy
-from flask_marshmallow import Marshmallow
+from dotenv import find_dotenv, load_dotenv
+from flask import Flask, jsonify, make_response, request
 from flask_cors import CORS
+from flask_marshmallow import Marshmallow
+from flask_sqlalchemy import SQLAlchemy
 
 
 load_dotenv(find_dotenv())
@@ -22,6 +24,7 @@ from .models import *
 from .schemas import *
 
 
+# Catch-all endpoint for serving Vue SPA
 @app.route('/', defaults={'path': ''})
 @app.route('/<string:path>')
 @app.route('/<path:path>')
@@ -38,15 +41,21 @@ def get_projects(teacher_id):
     return projects_schema.jsonify(projects)
 
 
+def get_project_info(project_id):
+    """Returns a project's details, iv info, and dv info"""
+    project_info = db.session.query(Project, IVInfo, DVInfo) \
+        .join(IVInfo, IVInfo.iv_info_id == Project.iv_info_id) \
+        .join(DVInfo, DVInfo.dv_info_id == Project.dv_info_id) \
+        .filter(Project.project_id == project_id).one()
+
+    return project_info
+
+
 # Returns info for project with id <project_id>
 @app.route('/projects/info/<project_id>', methods=['GET'])
 def get_project_by_id(project_id):
-    project_info = db.session.query(Project, IVInfo, DVInfo) \
-                   .join(IVInfo, IVInfo.iv_info_id == Project.iv_info_id) \
-                   .join(DVInfo, DVInfo.dv_info_id == Project.dv_info_id) \
-                   .filter(Project.project_id == project_id).one()
 
-    return projects_schema.jsonify(project_info)
+    return projects_schema.jsonify(get_project_info(project_id))
 
 
 # Updates project with id <project_id>
@@ -118,7 +127,7 @@ def create_project(teacher_id):
         db.session.add(new_project)
         db.session.commit()
         new_project.project_code = (
-            f'{date.today().year}-{teacher_id}-{new_project.project_id}'
+            f'{date.today().year}-{new_project.project_id}'
         )
         db.session.commit()
 
@@ -192,6 +201,48 @@ def delete_obs(obs_id):
     db.session.commit()
 
     return observation_schema.jsonify(observation)
+
+
+# Returns a list of observations for project with id <project_id>
+@app.route('/projects/info/<project_id>/results', methods=['GET'])
+def get_results(project_id):
+    observations = Observation.query.filter(
+        Observation.project_id == project_id).all()
+
+    return observations_schema.jsonify(observations)
+
+
+# Extracts observations for project with id <project_id>
+# into a csv file and downloads it
+@app.route('/projects/info/<project_id>/results/download', methods=['GET'])
+def download_results(project_id):
+    observations = Observation.query.filter(
+        Observation.project_id == project_id).all()
+    project_info = get_project_info(project_id)
+
+    headers = [
+        'Observation ID', 'Device ID', f'{project_info[1].iv_name}',
+        f'{project_info[2].dv_name}', 'Observation Date'
+    ]
+    rows = [
+        [
+            obs.obs_id, obs.device_id, obs.obs_vals['iv_val'],
+            obs.obs_vals['dv_val'], obs.obs_date.strftime('%m/%d/%Y')
+        ] for obs in observations
+    ]
+
+    # Code below adapted from
+    # https://stackoverflow.com/questions/26997679/writing-a-csv-from-flask-framework
+    # Date Retrieved: 10-Feb-2022
+    si = io.StringIO()
+    cw = csv.writer(si)
+    cw.writerow(headers)
+    cw.writerows(rows)
+    results = make_response(si.getvalue())
+    results.headers["Content-Disposition"] = "attachment; filename=results.csv"
+    results.headers["Content-type"] = "text/csv"
+
+    return results
 
 
 if __name__ == '__main__':
