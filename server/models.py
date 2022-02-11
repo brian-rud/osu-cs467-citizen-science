@@ -6,7 +6,7 @@ class Project(db.Model):
     __tablename__ = 'projects'
 
     project_id = db.Column(db.Integer, primary_key=True)
-    teacher_id = db.Column(db.String(), nullable=False)
+    teacher_id = db.Column(db.String(), unique=True, nullable=False)
     project_code = db.Column(db.String(), unique=True, nullable=False)
     title = db.Column(db.String(), nullable=False)
     description = db.Column(db.Text(), nullable=False)
