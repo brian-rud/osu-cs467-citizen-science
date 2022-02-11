@@ -213,7 +213,7 @@ def get_results(project_id):
 
 
 # Extracts observations for project with id <project_id>
-# into a csv file and downloads it
+# into a csv file and returns it for download
 @app.route('/projects/info/<project_id>/results/download', methods=['GET'])
 def download_results(project_id):
     observations = Observation.query.filter(
