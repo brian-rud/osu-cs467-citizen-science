@@ -224,7 +224,10 @@ class _ClassCodeInputState extends State<ClassCodeInput> {
                 final ProjectObj? _asyncProjectObj =
                     await _getProjectRequest(_classCode.text);
                 if (_asyncProjectObj == null) {
-                  print('Failed');
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                        content: Text('Not a valid code. Please try again.')),
+                  );
                 } else {
                   Navigator.push(context, MaterialPageRoute(builder: (context) {
                     UserSpecificObservationsObj currentUser =
