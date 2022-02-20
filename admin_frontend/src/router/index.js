@@ -29,7 +29,8 @@ const routes = [
     path: '/projects',
     name: 'Projects',
     component: Projects,
-    beforeEnter: routeGuard
+    beforeEnter: routeGuard,
+    props: true
   },
   {
     path: '/project/:id',
