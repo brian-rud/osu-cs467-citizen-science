@@ -175,7 +175,7 @@ def create_obs(project_code, device_id):
 def get_obs(project_code, device_id):
     project = Project.query.filter(Project.project_code == project_code).one()
     observations = Observation.query.filter(
-        Observation.project_id == project.project_id and
+        Observation.project_id == project.project_id,
         Observation.device_id == device_id
     )
 
