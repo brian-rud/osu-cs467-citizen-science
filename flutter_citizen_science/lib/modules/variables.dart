@@ -41,11 +41,11 @@ class IndependentVar {
   }
 
   String? get getIVType {
-    return '$name';
+    return '$type';
   }
 
   String? get getIVUnits {
-    return '$name';
+    return '$units';
   }
 
   Map? get getIVAccepted {
@@ -54,9 +54,15 @@ class IndependentVar {
 
   List<String> get getIVList {
     List<String> tempList = [];
-    for (int i = 0; i < accepted![type].length; i++) {
+    String checkerString = '';
+    if (accepted!.containsKey("Values")) {
+      checkerString = "Values";
+    } else {
+      checkerString = type!;
+    }
+    for (int i = 0; i < accepted![checkerString].length; i++) {
       if (accepted![type][i] == null) {
-        tempList.add('Loading...');
+        break;
       } else {
         tempList.add(accepted![type][i].toString());
       }
@@ -97,11 +103,11 @@ class DependentVar {
   }
 
   String? get getDVType {
-    return '$name';
+    return '$type';
   }
 
   String? get getDVUnits {
-    return '$name';
+    return '$units';
   }
 
   Map? get getDVAccepted {
@@ -110,9 +116,15 @@ class DependentVar {
 
   List<String> get getDVList {
     List<String> tempList = [];
-    for (int j = 0; j < accepted![type].length; j++) {
+    String checkerString = '';
+    if (accepted!.containsKey("Values")) {
+      checkerString = "Values";
+    } else {
+      checkerString = type!;
+    }
+    for (int j = 0; j < accepted![checkerString].length; j++) {
       if (accepted![type][j] == null) {
-        tempList.add('Loading...');
+        break;
       } else {
         tempList.add(accepted![type][j].toString());
       }

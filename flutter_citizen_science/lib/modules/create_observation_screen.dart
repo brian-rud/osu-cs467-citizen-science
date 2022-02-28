@@ -144,7 +144,7 @@ class _ObservationFormBodyState extends State<ObservationFormBody> {
           '/' +
           widget.currentUser.getUserID;
       Map<String, dynamic> encodingBody = {
-        "obs_vals": {"Brown", 4},
+        "obs_vals": {"iv_val": "Brown", "dv_val": 4},
       };
       final http.Response response = await http.post(Uri.parse(url),
           headers: {
@@ -162,23 +162,114 @@ class _ObservationFormBodyState extends State<ObservationFormBody> {
     print(wasResponse);
   }
 
-  Future<void> _submitObservations2() async {
-    var url = Uri.parse(
-        'https://cs467-citizen-science.herokuapp.com/field_app/' +
-            widget.currentProject.getProjectObj.getProjectCode +
-            '/' +
-            widget.currentUser.getUserID);
-    Map<String, dynamic> encodingBody = {
-      "obs_vals": {"Brown", 4},
-    };
-    var response = await http.post(url,
-        headers: {
-          "content-type": "application/json",
-          "accept": "application/json",
+  Widget configureForm(
+      IndependentVar iv, DependentVar dv, GlobalKey<FormState> formKey) {
+    // create column widget
+    List<Widget> columnList = [];
+    print(iv.getIVType);
+    print(dv.getDVType);
+    // method configures form for observation submission
+    if (iv.getIVType == null) {
+      columnList.add(const Text('sorry iv'));
+    }
+    if (dv.getDVType == null) {
+      columnList.add(const Text('sorry dv'));
+    }
+    // configure IV
+    if (iv.getIVType == "String") {
+      // REPLACE WITH VALUES AFTER
+      if (iv.getIVList.isNotEmpty) {
+        // create dropdown
+        columnList.add(const Text('String Dropdown'));
+      } else {
+        // create text input
+        columnList.add(const Text('String Text Input'));
+      }
+    } else if (iv.getIVType == "Num") {
+      if (iv.getIVList.isNotEmpty) {
+        // create dropdown
+        columnList.add(const Text('Num Dropdown'));
+      } else {
+        if (iv.accepted!.containsKey("interval_size") ||
+            iv.accepted!.containsKey("min") ||
+            iv.accepted!.containsKey("max")) {
+          // create slider
+          columnList.add(const Text('Num Slider'));
+        } else {
+          // create number input without validation
+          columnList.add(const Text('Num input'));
+        }
+      }
+    } else if (iv.getIVType == "Date") {
+      if (iv.accepted!.containsKey("min") && iv.accepted!.containsKey("max")) {
+        // date input with validation
+        columnList.add(const Text('Date input with validation'));
+      } else {
+        // date input without validation
+        columnList.add(const Text('Date input without validation'));
+      }
+    }
+    // configure DV
+    if (dv.getDVType == "String") {
+      // REPLACE WITH VALUES AFTER
+      if (dv.getDVList.isNotEmpty) {
+        // create dropdown
+        columnList.add(const Text('String Dropdown'));
+      } else {
+        // create text input
+        columnList.add(const Text('String Text Input'));
+      }
+    } else if (dv.getDVType == "Num") {
+      if (dv.getDVList.isNotEmpty) {
+        // create dropdown
+        columnList.add(const Text('Num Dropdown'));
+      } else {
+        if (dv.accepted!.containsKey("interval_size") ||
+            dv.accepted!.containsKey("min") ||
+            dv.accepted!.containsKey("max")) {
+          // create slider
+          columnList.add(const Text('Num Slider'));
+        } else {
+          // create number input without validation
+          columnList.add(const Text('Num input'));
+        }
+      }
+    } else if (dv.getDVType == "Date") {
+      if (dv.accepted!.containsKey("min") && dv.accepted!.containsKey("max")) {
+        // date input with validation
+        columnList.add(const Text('Date input with validation'));
+      } else {
+        // date input without validation
+        columnList.add(const Text('Date input without validation'));
+      }
+    }
+    columnList.add(Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16.0),
+      child: ElevatedButton(
+        onPressed: () {
+          _submitObservation();
         },
-        body: jsonEncode(encodingBody));
-    print('Response status: ${response.statusCode}');
-    print('Response body: ${response.body}');
+        child: submissionToggle
+            ? Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                  Text('Loading...'),
+                  CircularProgressIndicator(
+                    color: Colors.white,
+                  ),
+                ],
+              )
+            : const Text(
+                'Submit',
+              ),
+      ),
+    ));
+    return Form(
+        key: formKey,
+        child: Column(
+          children: columnList,
+          mainAxisAlignment: MainAxisAlignment.center,
+        ));
   }
 
   @override
@@ -197,7 +288,10 @@ class _ObservationFormBodyState extends State<ObservationFormBody> {
       ),
       margin: const EdgeInsets.all(10),
       padding: const EdgeInsets.all(10),
-      child: Form(
+      child: configureForm(widget.currentProject.getIndependentVar,
+          widget.currentProject.getDependentVar, _formKey),
+      /*
+      Form(
           key: _formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -267,7 +361,9 @@ class _ObservationFormBodyState extends State<ObservationFormBody> {
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 16.0),
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    _submitObservation();
+                  },
                   child: submissionToggle
                       ? Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -285,6 +381,7 @@ class _ObservationFormBodyState extends State<ObservationFormBody> {
               ),
             ],
           )),
+          */
     );
   }
 }
