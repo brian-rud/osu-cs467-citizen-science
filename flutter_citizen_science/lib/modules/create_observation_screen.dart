@@ -46,71 +46,6 @@ class _CreateObservationScreenState extends State<CreateObservationScreen> {
           currentProject: widget._currentProject,
           currentUser: widget._currentUser,
         ));
-    /*
-      Container(
-          alignment: Alignment.center,
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.all(Radius.circular(10)),
-          ),
-          margin: const EdgeInsets.all(10),
-          padding: const EdgeInsets.all(10),
-          child: ListView(
-            children: [
-              Text('Add observation here to ' +
-                  widget._currentProject.getProjectObj.getProjectTitle +
-                  ' for ' +
-                  widget._currentUser.getUserID),
-              Container(
-                alignment: Alignment.center,
-                padding: const EdgeInsets.all(10),
-                child: TextField(
-                  controller: _observationString,
-                  textAlign: TextAlign.center,
-                  decoration: const InputDecoration(
-                    fillColor: Colors.white,
-                    filled: true,
-                    // errorText: 'Invalid Code',
-                    enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                      color: Colors.black,
-                      width: 2,
-                    )),
-                    focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                      color: Colors.black,
-                      width: 2,
-                    )),
-                    labelText: 'Input String Observation',
-                  ),
-                ),
-              ),
-              Container(
-                height: 50,
-                padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                child: ElevatedButton(
-                  child: const Text(
-                    'Submit',
-                  ),
-                  onPressed: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) {
-                      _addObservation(_observationString.text);
-                      return ObservationsScreen(
-                          widget._currentProject, widget._currentUser);
-                    }));
-                  },
-                  style: ButtonStyle(
-                    textStyle: MaterialStateProperty.all(
-                        const TextStyle(fontSize: 20)),
-                    backgroundColor: MaterialStateProperty.all(Colors.black),
-                  ),
-                ),
-              )
-            ],
-          )),
-    );
-    */
   }
 }
 
@@ -132,19 +67,50 @@ class _ObservationFormBodyState extends State<ObservationFormBody> {
 
   double sliderValue = 0;
 
-  String dropdownValue = 'Loading...';
+  String ivDropdownValue = 'Loading...';
+  String dvDropdownValue = 'Loading...';
 
   bool submissionToggle = false;
 
-  Future<void> _submitObservation() async {
-    bool wasResponse = false;
+  String ivVal = '';
+  String dvVal = '';
+
+  void changeIVValue(String value) {
+    ivVal = value;
+  }
+
+  void changeDVValue(String value) {
+    dvVal = value;
+  }
+
+  bool isNumeric(String s) {
+    if (s == null) {
+      return false;
+    }
+    return double.tryParse(s) != null;
+  }
+
+  Future<void> _submitObservation(ivVal, dvVal) async {
+    String submissionMessage = 'Default Response';
+    var ivBodyObj;
+    var dvBodyObj;
+    if (isNumeric(ivVal)) {
+      ivBodyObj = double.parse(ivVal);
+    } else {
+      ivBodyObj = ivVal as String;
+    }
+    if (isNumeric(dvVal)) {
+      dvBodyObj = double.parse(dvVal);
+    } else {
+      dvBodyObj = dvVal as String;
+    }
     try {
       var url = 'https://cs467-citizen-science.herokuapp.com/field_app/' +
           widget.currentProject.getProjectObj.getProjectCode +
           '/' +
           widget.currentUser.getUserID;
       Map<String, dynamic> encodingBody = {
-        "obs_vals": {"iv_val": "Brown", "dv_val": 4},
+        "obs_vals": {"iv_val": ivBodyObj, "dv_val": dvBodyObj},
       };
       final http.Response response = await http.post(Uri.parse(url),
           headers: {
@@ -152,22 +118,35 @@ class _ObservationFormBodyState extends State<ObservationFormBody> {
             "accept": "application/json",
           },
           body: jsonEncode(encodingBody));
-      print('Response status: ${response.statusCode}');
-      if (response.statusCode == 200) {
-        wasResponse = true;
-      }
+      submissionMessage = 'Observation Submitted';
     } catch (err) {
-      print(err);
+      submissionMessage = 'Could not submit observation';
     }
-    print(wasResponse);
+    showDialog<String>(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: Text(submissionMessage),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Add Another'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.pop(context);
+            },
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget configureForm(
       IndependentVar iv, DependentVar dv, GlobalKey<FormState> formKey) {
     // create column widget
     List<Widget> columnList = [];
-    print(iv.getIVType);
-    print(dv.getDVType);
     // method configures form for observation submission
     if (iv.getIVType == null) {
       columnList.add(const Text('sorry iv'));
@@ -181,6 +160,10 @@ class _ObservationFormBodyState extends State<ObservationFormBody> {
       if (iv.getIVList.isNotEmpty) {
         // create dropdown
         columnList.add(const Text('String Dropdown'));
+        columnList.add(SelectionDropdown(
+          stringList: iv.getIVList,
+          val: changeIVValue,
+        ));
       } else {
         // create text input
         columnList.add(const Text('String Text Input'));
@@ -189,6 +172,10 @@ class _ObservationFormBodyState extends State<ObservationFormBody> {
       if (iv.getIVList.isNotEmpty) {
         // create dropdown
         columnList.add(const Text('Num Dropdown'));
+        columnList.add(SelectionDropdown(
+          stringList: iv.getIVList,
+          val: changeIVValue,
+        ));
       } else {
         if (iv.accepted!.containsKey("interval_size") ||
             iv.accepted!.containsKey("min") ||
@@ -215,6 +202,10 @@ class _ObservationFormBodyState extends State<ObservationFormBody> {
       if (dv.getDVList.isNotEmpty) {
         // create dropdown
         columnList.add(const Text('String Dropdown'));
+        columnList.add(SelectionDropdown(
+          stringList: dv.getDVList,
+          val: changeDVValue,
+        ));
       } else {
         // create text input
         columnList.add(const Text('String Text Input'));
@@ -223,6 +214,10 @@ class _ObservationFormBodyState extends State<ObservationFormBody> {
       if (dv.getDVList.isNotEmpty) {
         // create dropdown
         columnList.add(const Text('Num Dropdown'));
+        columnList.add(SelectionDropdown(
+          stringList: dv.getDVList,
+          val: changeDVValue,
+        ));
       } else {
         if (dv.accepted!.containsKey("interval_size") ||
             dv.accepted!.containsKey("min") ||
@@ -247,7 +242,7 @@ class _ObservationFormBodyState extends State<ObservationFormBody> {
       padding: const EdgeInsets.symmetric(vertical: 16.0),
       child: ElevatedButton(
         onPressed: () {
-          _submitObservation();
+          _submitObservation(ivVal, dvVal);
         },
         child: submissionToggle
             ? Row(
@@ -275,7 +270,12 @@ class _ObservationFormBodyState extends State<ObservationFormBody> {
   @override
   void initState() {
     super.initState();
-    dropdownValue = widget.currentProject.getIndependentVar.getIVList[0];
+    if (widget.currentProject.getIndependentVar.getIVList.isNotEmpty) {
+      ivVal = widget.currentProject.getIndependentVar.getIVList[0];
+    }
+    if (widget.currentProject.getDependentVar.getDVList.isNotEmpty) {
+      dvVal = widget.currentProject.getDependentVar.getDVList[0];
+    }
   }
 
   @override
@@ -290,107 +290,18 @@ class _ObservationFormBodyState extends State<ObservationFormBody> {
       padding: const EdgeInsets.all(10),
       child: configureForm(widget.currentProject.getIndependentVar,
           widget.currentProject.getDependentVar, _formKey),
-      /*
-      Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Text('Observation Form',
-                    style: TextStyle(
-                      color: Colors.blue,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 20.0,
-                    )),
-              ),
-              const Padding(
-                padding: EdgeInsets.fromLTRB(0, 0, 0, 8.0),
-                child: Divider(
-                  height: 10,
-                  thickness: 2,
-                  endIndent: 0,
-                  color: Colors.blue,
-                ),
-              ),
-              Text(
-                  widget.currentProject.getIndependentVar.getIVName ??
-                      'Independent Variable',
-                  style: const TextStyle(
-                    color: Colors.blue,
-                    fontWeight: FontWeight.w500,
-                    fontSize: 18.0,
-                  )),
-              SelectionDropdown(
-                  stringList:
-                      widget.currentProject.getIndependentVar.getIVList),
-              const Padding(
-                padding: EdgeInsets.fromLTRB(0, 0, 8.0, 8.0),
-                child: Divider(
-                  height: 10,
-                  thickness: 2,
-                  endIndent: 0,
-                  color: Colors.blue,
-                ),
-              ),
-              Text(
-                  widget.currentProject.getDependentVar.getDVName ??
-                      'Dependent Variable',
-                  style: const TextStyle(
-                    color: Colors.blue,
-                    fontWeight: FontWeight.w500,
-                    fontSize: 18.0,
-                  )),
-              Text(sliderValue.toString(),
-                  style: const TextStyle(
-                    color: Colors.blue,
-                    fontWeight: FontWeight.w500,
-                    fontSize: 15.0,
-                  )),
-              Slider.adaptive(
-                  value: sliderValue,
-                  divisions: 7,
-                  min: 0,
-                  max: 7,
-                  onChanged: (newValue) {
-                    setState(() {
-                      sliderValue = newValue;
-                    });
-                  }),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16.0),
-                child: ElevatedButton(
-                  onPressed: () {
-                    _submitObservation();
-                  },
-                  child: submissionToggle
-                      ? Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
-                            Text('Loading...'),
-                            CircularProgressIndicator(
-                              color: Colors.white,
-                            ),
-                          ],
-                        )
-                      : const Text(
-                          'Submit',
-                        ),
-                ),
-              ),
-            ],
-          )),
-          */
     );
   }
 }
 
 class SelectionDropdown extends StatefulWidget {
-  const SelectionDropdown({Key? key, required this.stringList})
+  const SelectionDropdown(
+      {Key? key, required this.stringList, required this.val})
       : super(key: key);
 
   final List<String> stringList;
+
+  final void Function(String value) val;
 
   @override
   _SelectionDropdownState createState() => _SelectionDropdownState();
@@ -421,6 +332,7 @@ class _SelectionDropdownState extends State<SelectionDropdown> {
       onChanged: (String? newValue) {
         setState(() {
           dropdownValue = newValue!;
+          widget.val(dropdownValue);
         });
       },
       items: widget.stringList.map<DropdownMenuItem<String>>((String value) {
