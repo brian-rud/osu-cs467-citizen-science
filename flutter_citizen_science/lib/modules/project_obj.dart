@@ -3,7 +3,7 @@
 
 class ProjectObj {
   int? projectID;
-  int? teacherID;
+  String? teacherID;
   String? projectCode;
   String? projectTitle;
   String? projectDesc;
@@ -55,8 +55,8 @@ class ProjectObj {
     return projectID;
   }
 
-  int? get getTeacherID {
-    return teacherID;
+  String? get getTeacherID {
+    return '$teacherID';
   }
 
   String get getProjectCode {
