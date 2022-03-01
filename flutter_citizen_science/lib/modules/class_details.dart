@@ -28,9 +28,12 @@ class ClassDetailsScreen extends StatelessWidget {
           icon: const Icon(Icons.arrow_back),
           tooltip: 'Back to Observations Screen',
           onPressed: () {
+            Navigator.pop(context);
+            /*
             Navigator.push(context, MaterialPageRoute(builder: (context) {
               return const CodeInputScreen();
             }));
+            */
           },
         ),
       ),

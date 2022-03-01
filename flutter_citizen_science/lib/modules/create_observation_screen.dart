@@ -8,7 +8,7 @@ import 'project_bundle.dart';
 
 class CreateObservationScreen extends StatefulWidget {
   const CreateObservationScreen(this._currentProject, this._currentUser,
-      {Key? key})
+      {Key? key, required this.isEditing, required this.editObsID})
       : super(key: key);
 
   final ProjectBundle _currentProject;
@@ -16,6 +16,10 @@ class CreateObservationScreen extends StatefulWidget {
   final UserSpecificObservationsObj _currentUser;
 
   final _title = 'Citizen Science App';
+
+  final bool isEditing;
+
+  final int editObsID;
 
   @override
   _CreateObservationScreenState createState() =>
@@ -34,12 +38,15 @@ class _CreateObservationScreenState extends State<CreateObservationScreen> {
             icon: const Icon(Icons.arrow_back),
             tooltip: 'Back to Observations Screen',
             onPressed: () {
+              Navigator.pop(context);
+              /*
               setState(() {
                 Navigator.push(context, MaterialPageRoute(builder: (context) {
                   return ObservationsScreen(
                       widget._currentProject, widget._currentUser);
                 }));
               });
+              */
             },
           ),
         ),
@@ -47,18 +54,28 @@ class _CreateObservationScreenState extends State<CreateObservationScreen> {
         body: ObservationFormBody(
           currentProject: widget._currentProject,
           currentUser: widget._currentUser,
+          isEditing: widget.isEditing,
+          editObsID: widget.editObsID,
         ));
   }
 }
 
 class ObservationFormBody extends StatefulWidget {
   const ObservationFormBody(
-      {Key? key, required this.currentProject, required this.currentUser})
+      {Key? key,
+      required this.currentProject,
+      required this.currentUser,
+      required this.isEditing,
+      required this.editObsID})
       : super(key: key);
 
   final ProjectBundle currentProject;
 
   final UserSpecificObservationsObj currentUser;
+
+  final bool isEditing;
+
+  final int editObsID;
 
   @override
   _ObservationFormBodyState createState() => _ObservationFormBodyState();
@@ -67,10 +84,12 @@ class ObservationFormBody extends StatefulWidget {
 class _ObservationFormBodyState extends State<ObservationFormBody> {
   final _formKey = GlobalKey<FormState>();
 
-  double sliderValue = 0;
-
   String ivDropdownValue = 'Loading...';
   String dvDropdownValue = 'Loading...';
+  double ivSliderValue = 0;
+  double dvSliderValue = 0;
+  final TextEditingController ivTextController = TextEditingController();
+  final TextEditingController dvTextController = TextEditingController();
 
   bool submissionToggle = false;
 
@@ -131,18 +150,61 @@ class _ObservationFormBodyState extends State<ObservationFormBody> {
         actions: <Widget>[
           TextButton(
             onPressed: () {
-              setState(() {
-                Navigator.pop(context);
-              });
+              Navigator.pop(context);
             },
             child: const Text('Add Another'),
           ),
           TextButton(
             onPressed: () {
-              setState(() {
-                Navigator.pop(context);
-                Navigator.pop(context);
-              });
+              Navigator.pop(context);
+              Navigator.pop(context);
+            },
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _editObservation(ivVal, dvVal, int obsID) async {
+    String submissionMessage = 'Default Response';
+    var ivBodyObj;
+    var dvBodyObj;
+    if (isNumeric(ivVal)) {
+      ivBodyObj = double.parse(ivVal);
+    } else {
+      ivBodyObj = ivVal as String;
+    }
+    if (isNumeric(dvVal)) {
+      dvBodyObj = double.parse(dvVal);
+    } else {
+      dvBodyObj = dvVal as String;
+    }
+    try {
+      var url = 'https://cs467-citizen-science.herokuapp.com/field_app/' +
+          obsID.toString();
+      Map<String, dynamic> encodingBody = {
+        "obs_vals": {"iv_val": ivBodyObj, "dv_val": dvBodyObj},
+      };
+      await http.put(Uri.parse(url),
+          headers: {
+            "content-type": "application/json",
+            "accept": "application/json",
+          },
+          body: jsonEncode(encodingBody));
+      submissionMessage = 'Observation Edited';
+    } catch (err) {
+      submissionMessage = 'Could not submit edit';
+    }
+    showDialog<String>(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: Text(submissionMessage),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.pop(context);
             },
             child: const Text('OK'),
           ),
@@ -157,10 +219,10 @@ class _ObservationFormBodyState extends State<ObservationFormBody> {
     List<Widget> columnList = [];
     // method configures form for observation submission
     if (iv.getIVType == null) {
-      columnList.add(const Text('sorry iv'));
+      columnList.add(const Text('No IV'));
     }
     if (dv.getDVType == null) {
-      columnList.add(const Text('sorry dv'));
+      columnList.add(const Text('No DV'));
     }
     // configure IV
     if (iv.getIVType == "String") {
@@ -175,6 +237,20 @@ class _ObservationFormBodyState extends State<ObservationFormBody> {
       } else {
         // create text input
         columnList.add(const Text('String Text Input'));
+        columnList.add(
+          TextFormField(
+            controller: ivTextController,
+            decoration: const InputDecoration(border: OutlineInputBorder()),
+            // The validator receives the text that the user has entered.
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter an observation';
+              }
+              changeIVValue(ivTextController.text);
+              return null;
+            },
+          ),
+        );
       }
     } else if (iv.getIVType == "Num") {
       if (iv.getIVList.isNotEmpty) {
@@ -190,9 +266,36 @@ class _ObservationFormBodyState extends State<ObservationFormBody> {
             iv.accepted!.containsKey("max")) {
           // create slider
           columnList.add(const Text('Num Slider'));
+          columnList.add(Slider(
+            value: ivSliderValue,
+            min: iv.accepted!["min"],
+            max: iv.accepted!["max"],
+            divisions: iv.accepted!["interval_size"],
+            label: ivSliderValue.round().toString(),
+            onChanged: (double value) {
+              setState(() {
+                ivSliderValue = value;
+                changeIVValue(ivSliderValue.toString());
+              });
+            },
+          ));
         } else {
           // create number input without validation
           columnList.add(const Text('Num input'));
+          columnList.add(
+            TextFormField(
+              controller: ivTextController,
+              decoration: const InputDecoration(border: OutlineInputBorder()),
+              // The validator receives the text that the user has entered.
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter an observation';
+                }
+                changeIVValue(ivTextController.text);
+                return null;
+              },
+            ),
+          );
         }
       }
     } else if (iv.getIVType == "Date") {
@@ -217,6 +320,20 @@ class _ObservationFormBodyState extends State<ObservationFormBody> {
       } else {
         // create text input
         columnList.add(const Text('String Text Input'));
+        columnList.add(
+          TextFormField(
+            controller: dvTextController,
+            decoration: const InputDecoration(border: OutlineInputBorder()),
+            // The validator receives the text that the user has entered.
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter an observation';
+              }
+              changeDVValue(dvTextController.text);
+              return null;
+            },
+          ),
+        );
       }
     } else if (dv.getDVType == "Num") {
       if (dv.getDVList.isNotEmpty) {
@@ -232,9 +349,36 @@ class _ObservationFormBodyState extends State<ObservationFormBody> {
             dv.accepted!.containsKey("max")) {
           // create slider
           columnList.add(const Text('Num Slider'));
+          columnList.add(Slider(
+            value: dvSliderValue,
+            min: dv.accepted!["min"],
+            max: dv.accepted!["max"],
+            divisions: dv.accepted!["interval_size"],
+            label: dvSliderValue.round().toString(),
+            onChanged: (double value) {
+              setState(() {
+                dvSliderValue = value;
+                changeDVValue(dvSliderValue.toString());
+              });
+            },
+          ));
         } else {
           // create number input without validation
           columnList.add(const Text('Num input'));
+          columnList.add(
+            TextFormField(
+              controller: dvTextController,
+              decoration: const InputDecoration(border: OutlineInputBorder()),
+              // The validator receives the text that the user has entered.
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter an observation';
+                }
+                changeDVValue(dvTextController.text);
+                return null;
+              },
+            ),
+          );
         }
       }
     } else if (dv.getDVType == "Date") {
@@ -250,7 +394,13 @@ class _ObservationFormBodyState extends State<ObservationFormBody> {
       padding: const EdgeInsets.symmetric(vertical: 16.0),
       child: ElevatedButton(
         onPressed: () {
-          _submitObservation(ivVal, dvVal);
+          if (_formKey.currentState!.validate()) {
+            if (widget.isEditing) {
+              _editObservation(ivVal, dvVal, widget.editObsID);
+            } else {
+              _submitObservation(ivVal, dvVal);
+            }
+          }
         },
         child: submissionToggle
             ? Row(
@@ -262,9 +412,11 @@ class _ObservationFormBodyState extends State<ObservationFormBody> {
                   ),
                 ],
               )
-            : const Text(
-                'Submit',
-              ),
+            : widget.isEditing
+                ? const Text(
+                    'Edit',
+                  )
+                : const Text('Submit'),
       ),
     ));
     return Form(
@@ -284,6 +436,13 @@ class _ObservationFormBodyState extends State<ObservationFormBody> {
     if (widget.currentProject.getDependentVar.getDVList.isNotEmpty) {
       dvVal = widget.currentProject.getDependentVar.getDVList[0];
     }
+  }
+
+  @override
+  void dispose() {
+    ivTextController.dispose();
+    dvTextController.dispose();
+    super.dispose();
   }
 
   @override

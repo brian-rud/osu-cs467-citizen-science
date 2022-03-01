@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ffi';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_citizen_science/modules/class_details.dart';
@@ -36,10 +37,13 @@ class _ObservationsScreenState extends State<ObservationsScreen> {
             icon: const Icon(Icons.arrow_back),
             tooltip: 'Back to Observations Screen',
             onPressed: () {
+              Navigator.pop(context);
+              /*
               Navigator.push(context, MaterialPageRoute(builder: (context) {
                 return ClassDetailsScreen(
                     widget._currentProject, widget._currentUser);
               }));
+              */
             },
           ),
         ),
@@ -50,13 +54,17 @@ class _ObservationsScreenState extends State<ObservationsScreen> {
             // isExtended: true,
             child: const Icon(Icons.add),
             backgroundColor: Colors.green,
-            elevation: 5.0,
+            elevation: 10.0,
             onPressed: () {
               Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => CreateObservationScreen(
-                        widget._currentProject, widget._currentUser),
+                      widget._currentProject,
+                      widget._currentUser,
+                      isEditing: false,
+                      editObsID: 0,
+                    ),
                   )).then((value) {
                 setState(() {});
               });
@@ -96,6 +104,39 @@ class _ObservationViewState extends State<ObservationView> {
     return posts;
   }
 
+  void _deleteObservation(int obsId) {
+    showDialog<String>(
+        context: context,
+        builder: (BuildContext context) => AlertDialog(
+              title: const Text(
+                  "Are you sure you want to delete this observation?"),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text('NO'),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    try {
+                      var url =
+                          'https://cs467-citizen-science.herokuapp.com/field_app/' +
+                              obsId.toString();
+                      await http.delete(Uri.parse(url));
+                    } catch (err) {
+                      print(err);
+                    }
+                    Navigator.pop(context);
+                  },
+                  child: const Text('YES'),
+                ),
+              ],
+            )).then((value) {
+      setState(() {});
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -129,20 +170,34 @@ class _ObservationViewState extends State<ObservationView> {
                                 subtitle: Text(snapshot.data![index]['obs_vals']
                                         ['dv_val']
                                     .toString()),
+                                trailing: Text(
+                                    snapshot.data![index]['obs_id'].toString()),
                               ),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
                                   TextButton(
                                       onPressed: () {
-                                        print('Edit pressed!');
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  CreateObservationScreen(
+                                                widget._currentProject,
+                                                widget._currentUser,
+                                                isEditing: true,
+                                                editObsID: snapshot.data![index]
+                                                    ['obs_id'],
+                                              ),
+                                            )).then((value) {
+                                          setState(() {});
+                                        });
                                       },
                                       child: const Text('EDIT')),
                                   TextButton(
                                       onPressed: () {
-                                        setState(() {
-                                          print('Delete pressed!');
-                                        });
+                                        _deleteObservation(
+                                            snapshot.data![index]['obs_id']);
                                       },
                                       child: const Text('DELETE'))
                                 ],
