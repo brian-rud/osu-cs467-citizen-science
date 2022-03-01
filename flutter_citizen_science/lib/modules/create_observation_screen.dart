@@ -34,10 +34,12 @@ class _CreateObservationScreenState extends State<CreateObservationScreen> {
             icon: const Icon(Icons.arrow_back),
             tooltip: 'Back to Observations Screen',
             onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) {
-                return ObservationsScreen(
-                    widget._currentProject, widget._currentUser);
-              }));
+              setState(() {
+                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  return ObservationsScreen(
+                      widget._currentProject, widget._currentUser);
+                }));
+              });
             },
           ),
         ),
@@ -128,13 +130,19 @@ class _ObservationFormBodyState extends State<ObservationFormBody> {
         title: Text(submissionMessage),
         actions: <Widget>[
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () {
+              setState(() {
+                Navigator.pop(context);
+              });
+            },
             child: const Text('Add Another'),
           ),
           TextButton(
             onPressed: () {
-              Navigator.pop(context);
-              Navigator.pop(context);
+              setState(() {
+                Navigator.pop(context);
+                Navigator.pop(context);
+              });
             },
             child: const Text('OK'),
           ),

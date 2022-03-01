@@ -57,7 +57,9 @@ class _ObservationsScreenState extends State<ObservationsScreen> {
                   MaterialPageRoute(
                     builder: (context) => CreateObservationScreen(
                         widget._currentProject, widget._currentUser),
-                  ));
+                  )).then((value) {
+                setState(() {});
+              });
             }));
   }
 }
@@ -91,7 +93,6 @@ class _ObservationViewState extends State<ObservationView> {
     } catch (err) {
       print(err);
     }
-
     return posts;
   }
 
