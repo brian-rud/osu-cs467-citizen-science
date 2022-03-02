@@ -258,8 +258,11 @@ class _ClassCodeInputState extends State<ClassCodeInput> {
                   });
                   Navigator.push(context, MaterialPageRoute(builder: (context) {
                     UserSpecificObservationsObj currentUser =
-                        UserSpecificObservationsObj(_deviceData['id'],
-                            _asyncProject.getProjectObj.getProjectID, []);
+                        UserSpecificObservationsObj(
+                            _deviceData['id'] ??
+                                _deviceData['identifierForVendor'],
+                            _asyncProject.getProjectObj.getProjectID,
+                            []);
                     return ClassDetailsScreen(_asyncProject, currentUser);
                   }));
                 }
