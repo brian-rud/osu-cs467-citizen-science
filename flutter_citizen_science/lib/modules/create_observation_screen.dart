@@ -32,7 +32,8 @@ class _CreateObservationScreenState extends State<CreateObservationScreen> {
     return Scaffold(
         appBar: AppBar(
           centerTitle: true,
-          title: Text(widget._title),
+          title: Text(
+              widget.isEditing ? "Edit Observation" : "Create Observation"),
           backgroundColor: Colors.black,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
@@ -96,6 +97,9 @@ class _ObservationFormBodyState extends State<ObservationFormBody> {
   String ivVal = '';
   String dvVal = '';
 
+  final ButtonStyle submitButtonStyle =
+      ElevatedButton.styleFrom(textStyle: const TextStyle(fontSize: 18.0));
+
   void changeIVValue(String value) {
     ivVal = value;
   }
@@ -152,7 +156,7 @@ class _ObservationFormBodyState extends State<ObservationFormBody> {
             onPressed: () {
               Navigator.pop(context);
             },
-            child: const Text('Add Another'),
+            child: const Text('ADD ANOTHER'),
           ),
           TextButton(
             onPressed: () {
@@ -217,6 +221,15 @@ class _ObservationFormBodyState extends State<ObservationFormBody> {
       IndependentVar iv, DependentVar dv, GlobalKey<FormState> formKey) {
     // create column widget
     List<Widget> columnList = [];
+    // add prompt
+    columnList.add(Padding(
+      padding: const EdgeInsets.fromLTRB(0, 10.0, 0, 10.0),
+      child: Text(
+        widget.currentProject.getProjectObj.getProjectPrompt,
+        style: const TextStyle(
+            fontWeight: FontWeight.w600, fontSize: 22.0, color: Colors.blue),
+      ),
+    ));
     // method configures form for observation submission
     if (iv.getIVType == null) {
       columnList.add(const Text('No IV'));
@@ -225,6 +238,13 @@ class _ObservationFormBodyState extends State<ObservationFormBody> {
       columnList.add(const Text('No DV'));
     }
     // configure IV
+    columnList.add(Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Text(
+          widget.currentProject.getIndependentVar.getIVName ?? "IV",
+          style: const TextStyle(
+              fontWeight: FontWeight.w600, fontSize: 20.0, color: Colors.blue),
+        )));
     if (iv.getIVType == "String") {
       // REPLACE WITH VALUES AFTER
       if (iv.getIVList.isNotEmpty) {
@@ -289,7 +309,7 @@ class _ObservationFormBodyState extends State<ObservationFormBody> {
               // The validator receives the text that the user has entered.
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return 'Please enter an observation';
+                  return 'Please enter a number';
                 }
                 changeIVValue(ivTextController.text);
                 return null;
@@ -307,6 +327,14 @@ class _ObservationFormBodyState extends State<ObservationFormBody> {
         columnList.add(const Text('Date input without validation'));
       }
     }
+    columnList.add(const Padding(padding: EdgeInsets.fromLTRB(0, 5.0, 0, 5.0)));
+    columnList.add(Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Text(
+          widget.currentProject.getDependentVar.getDVName ?? "DV",
+          style: const TextStyle(
+              fontWeight: FontWeight.w600, fontSize: 20.0, color: Colors.blue),
+        )));
     // configure DV
     if (dv.getDVType == "String") {
       // REPLACE WITH VALUES AFTER
@@ -372,7 +400,7 @@ class _ObservationFormBodyState extends State<ObservationFormBody> {
               // The validator receives the text that the user has entered.
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return 'Please enter an observation';
+                  return 'Please enter a number';
                 }
                 changeDVValue(dvTextController.text);
                 return null;
@@ -393,6 +421,7 @@ class _ObservationFormBodyState extends State<ObservationFormBody> {
     columnList.add(Padding(
       padding: const EdgeInsets.symmetric(vertical: 16.0),
       child: ElevatedButton(
+        style: submitButtonStyle,
         onPressed: () {
           if (_formKey.currentState!.validate()) {
             if (widget.isEditing) {
@@ -490,6 +519,7 @@ class _SelectionDropdownState extends State<SelectionDropdown> {
       icon: const Icon(Icons.arrow_downward),
       elevation: 16,
       style: const TextStyle(
+        fontSize: 20.0,
         color: Colors.blue,
       ),
       underline: Container(

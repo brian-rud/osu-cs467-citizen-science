@@ -31,7 +31,7 @@ class _ObservationsScreenState extends State<ObservationsScreen> {
     return Scaffold(
         appBar: AppBar(
           centerTitle: true,
-          title: Text(_title),
+          title: const Text("My Observations"),
           backgroundColor: Colors.black,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
@@ -154,27 +154,75 @@ class _ObservationViewState extends State<ObservationView> {
                     ? ListView.builder(
                         itemCount: snapshot.data!.length,
                         itemBuilder: (BuildContext context, index) => Card(
+                          shape: const RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10.0))),
                           margin: const EdgeInsets.all(10),
                           child: Column(
                             children: [
                               Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                    'Observation: ' + (index + 1).toString()),
-                              ),
-                              ListTile(
-                                contentPadding: const EdgeInsets.all(10),
-                                title: Text(snapshot.data![index]['obs_vals']
-                                        ['iv_val']
-                                    .toString()),
-                                subtitle: Text(snapshot.data![index]['obs_vals']
-                                        ['dv_val']
-                                    .toString()),
-                                trailing: Text(
-                                    snapshot.data![index]['obs_id'].toString()),
+                                padding: const EdgeInsets.all(10.0),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
+                                  children: [
+                                    Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Text(
+                                            widget
+                                                    ._currentProject
+                                                    .getIndependentVar
+                                                    .getIVName ??
+                                                "IV",
+                                            style: const TextStyle(
+                                                fontSize: 18.0,
+                                                fontWeight: FontWeight.w500),
+                                          ),
+                                        ),
+                                        Text(
+                                            snapshot.data![index]['obs_vals']
+                                                    ['iv_val']
+                                                .toString(),
+                                            style: const TextStyle(
+                                                fontSize: 16.0,
+                                                fontWeight: FontWeight.normal))
+                                      ],
+                                    ),
+                                    Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Text(
+                                              widget
+                                                      ._currentProject
+                                                      .getDependentVar
+                                                      .getDVName ??
+                                                  "DV",
+                                              style: const TextStyle(
+                                                  fontSize: 18.0,
+                                                  fontWeight: FontWeight.w500)),
+                                        ),
+                                        Text(
+                                            snapshot.data![index]['obs_vals']
+                                                    ['dv_val']
+                                                .toString(),
+                                            style: const TextStyle(
+                                                fontSize: 16.0,
+                                                fontWeight: FontWeight.normal))
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
                                 children: [
                                   TextButton(
                                       onPressed: () {
