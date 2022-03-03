@@ -1,11 +1,15 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
 import 'package:device_info_plus/device_info_plus.dart';
 import 'class_details.dart';
 import 'project_obj.dart';
 import 'user_observations_obj.dart';
+import 'variables.dart';
+import 'project_bundle.dart';
 
 // home input page
 
@@ -18,26 +22,29 @@ class CodeInputScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Center(child: Text(_title)),
+        centerTitle: true,
+        title: Text(_title),
         backgroundColor: Colors.black,
       ),
-      drawer: ListView(
-        padding: EdgeInsets.zero,
-        children: [
-          const DrawerHeader(
+      drawer: Drawer(
+        backgroundColor: Colors.white,
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            const DrawerHeader(
+              child: FlutterLogo(),
               decoration: BoxDecoration(
-                color: Colors.black,
+                color: Colors.lightBlue,
               ),
-              child: Text('Citizen Science App for Kids')),
-          ListTile(
-            title: const Text('About'),
-            tileColor: Colors.white,
-            onTap: () {
-              // Update the state of the app.
-              Navigator.pop(context);
-            },
-          ),
-        ],
+            ),
+            ListTile(
+              title: const Text('Back'),
+              onTap: () {
+                Navigator.pop(context);
+              },
+            )
+          ],
+        ),
       ),
       body: const ClassCodeInput(),
       backgroundColor: Colors.lightGreenAccent,
@@ -60,9 +67,8 @@ class _ClassCodeInputState extends State<ClassCodeInput> {
 
   @override
   void initState() {
-    super.initState();
     initPlatformState();
-    // Start listening to changes.
+    super.initState();
   }
 
   @override
@@ -144,19 +150,24 @@ class _ClassCodeInputState extends State<ClassCodeInput> {
     };
   }
 
-  ProjectObj _getProjectObject() {
-    // sample object currently, will build error catching with http request
-    ProjectObj currentProject = ProjectObj(
-        1,
-        1,
-        1111,
-        'Example Project',
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut placerat orci nulla pellentesque dignissim. Sollicitudin nibh sit amet commodo nulla facilisi nullam. Ipsum dolor sit amet consectetur adipiscing elit pellentesque habitant morbi. Aliquam sem et tortor consequat id porta nibh. Orci phasellus egestas tellus rutrum tellus. Ornare arcu odio ut sem nulla pharetra diam sit. Ut aliquam purus sit amet luctus venenatis lectus magna. Cursus metus aliquam eleifend mi in nulla. Aliquam purus sit amet luctus venenatis lectus magna. Orci dapibus ultrices in iaculis nunc sed. Quis varius quam quisque id diam vel quam elementum. Egestas sed sed risus pretium quam vulputate dignissim suspendisse. A scelerisque purus semper eget duis at tellus. Phasellus egestas tellus rutrum tellus pellentesque eu tincidunt. Proin sagittis nisl rhoncus mattis rhoncus urna neque viverra. Tempor nec feugiat nisl pretium fusce id velit ut.',
-        'Example Project Prompt',
-        'Science',
-        DateTime.utc(2023, 11, 9));
-    return currentProject;
+  Future<ProjectBundle?> _getProjectRequest(projectCode) async {
+    ProjectBundle asyncProject;
+    // test code = 2022-1-1
+    var url = Uri.parse(
+        'https://cs467-citizen-science.herokuapp.com/field_app/' + projectCode);
+    var response = await http.get(url);
+    print('Response status: ${response.statusCode}');
+    if (response.statusCode == 200) {
+      var data = jsonDecode(response.body);
+      asyncProject = ProjectBundle(ProjectObj.fromJson(data[0]),
+          IndependentVar.fromJson(data[1]), DependentVar.fromJson(data[2]));
+      return asyncProject;
+    } else {
+      return null;
+    }
   }
+
+  bool isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -168,12 +179,12 @@ class _ClassCodeInputState extends State<ClassCodeInput> {
             alignment: Alignment.center,
             padding: const EdgeInsets.all(40),
             child: const FittedBox(
-              fit: BoxFit.contain,
-              child: FlutterLogo(
-                curve: Curves.bounceIn,
-                size: 100,
-              ),
-            ),
+                fit: BoxFit.contain,
+                child: Icon(
+                  Icons.psychology,
+                  color: Colors.blue,
+                  size: 100.0,
+                )),
           ),
           Container(
               alignment: Alignment.center,
@@ -214,17 +225,47 @@ class _ClassCodeInputState extends State<ClassCodeInput> {
             height: 50,
             padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
             child: ElevatedButton(
-              child: const Text(
-                'Submit',
-              ),
-              onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) {
-                  ProjectObj currentProject = _getProjectObject();
-                  UserSpecificObservationsObj currentUser =
-                      UserSpecificObservationsObj(
-                          _deviceData['id'], currentProject.getProjectID, []);
-                  return ClassDetailsScreen(currentProject, currentUser);
-                }));
+              child: isLoading
+                  ? Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Text('Loading...'),
+                        CircularProgressIndicator(
+                          color: Colors.white,
+                        ),
+                      ],
+                    )
+                  : const Text(
+                      'Submit',
+                    ),
+              onPressed: () async {
+                setState(() {
+                  isLoading = true;
+                });
+                final ProjectBundle? _asyncProject =
+                    await _getProjectRequest(_classCode.text);
+                if (_asyncProject == null) {
+                  setState(() {
+                    isLoading = false;
+                  });
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                        content: Text('Not a valid code. Please try again.')),
+                  );
+                } else {
+                  setState(() {
+                    isLoading = false;
+                  });
+                  Navigator.push(context, MaterialPageRoute(builder: (context) {
+                    UserSpecificObservationsObj currentUser =
+                        UserSpecificObservationsObj(
+                            _deviceData['id'] ??
+                                _deviceData['identifierForVendor'],
+                            _asyncProject.getProjectObj.getProjectID,
+                            []);
+                    return ClassDetailsScreen(_asyncProject, currentUser);
+                  }));
+                }
               },
               style: ButtonStyle(
                 textStyle:

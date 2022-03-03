@@ -3,13 +3,15 @@
 
 class ProjectObj {
   int? projectID;
-  int? teacherID;
-  int? projectCode;
+  String? teacherID;
+  String? projectCode;
   String? projectTitle;
   String? projectDesc;
   String? projectPrompt;
   String? projectCategory;
   DateTime? projectEndDate;
+  int? projectDvInfoID;
+  int? projectIvInfoID;
 
   ProjectObj(
       this.projectID,
@@ -19,7 +21,14 @@ class ProjectObj {
       this.projectDesc,
       this.projectPrompt,
       this.projectCategory,
-      this.projectEndDate);
+      this.projectEndDate,
+      this.projectDvInfoID,
+      this.projectIvInfoID);
+
+  static Future<ProjectObj> getInstance(jsonData) async {
+    var tempData = (await jsonData);
+    return ProjectObj.fromJson(tempData);
+  }
 
   ProjectObj.fromJson(Map<String, dynamic> json)
       : projectID = json['project_id'],
@@ -29,7 +38,9 @@ class ProjectObj {
         projectDesc = json['description'],
         projectPrompt = json['prompt'],
         projectCategory = json['category'],
-        projectEndDate = json['end_date'];
+        projectEndDate = DateTime.parse(json['end_date']),
+        projectDvInfoID = json['dv_info_id'],
+        projectIvInfoID = json['iv_info_id'];
 
   // GET methods
   String get getProjectTitle {
@@ -44,12 +55,12 @@ class ProjectObj {
     return projectID;
   }
 
-  int? get getTeacherID {
-    return teacherID;
+  String? get getTeacherID {
+    return '$teacherID';
   }
 
-  int? get getProjectCode {
-    return projectCode;
+  String get getProjectCode {
+    return '$projectCode';
   }
 
   String get getProjectPrompt {
@@ -62,5 +73,13 @@ class ProjectObj {
 
   DateTime? get getEndDate {
     return projectEndDate;
+  }
+
+  int? get getProjectIvInfoID {
+    return projectIvInfoID;
+  }
+
+  int? get getProjectDvInfoID {
+    return projectDvInfoID;
   }
 }
