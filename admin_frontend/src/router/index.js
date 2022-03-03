@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Home from '@/views/Home'
-import About from '@/views/About'
 import Projects from '@/views/Projects'
 import NewProject from '@/views/NewProject'
 import SingleProject from '@/views/SingleProject'
@@ -15,12 +14,6 @@ const routes = [
     path: '/',
     name: 'Home',
     component: Home
-  },
-  {
-    path: '/about',
-    name: 'About',
-    component: About,
-    //beforeEnter: routeGuard
   },
   {
     path: '/callback',
