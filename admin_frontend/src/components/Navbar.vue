@@ -10,9 +10,6 @@
         <li class="nav-item">
           <router-link class="nav-link active" aria-current="page" to="/">Home</router-link>
         </li>
-        <li class="nav-item">
-          <router-link class="nav-link" to="/about">About</router-link>
-        </li>
         <li class="nav-item" v-if="$auth.isAuthenticated.value">
           <router-link class="nav-link" to="/projects">Projects</router-link>
         </li>
