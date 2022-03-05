@@ -1,5 +1,6 @@
-import createAuth0Client from '@auth0/auth0-spa-js'
-import { computed, reactive, watchEffect } from 'vue'
+// index.js source: https://github.com/lstyles/vue3-auth0-sample
+import createAuth0Client from '@auth0/auth0-spa-js';
+import { computed, reactive, watchEffect } from 'vue';
 
 let client
 const state = reactive({

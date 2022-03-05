@@ -3,16 +3,12 @@
     <div class="container">
         <slot></slot>
     </div>
-
 </template>
 
 <script>
-import Navbar from "@/components/Navbar.vue"
+    import Navbar from "@/components/Navbar.vue";
 
-export default {
-    components: {
-        Navbar
+    export default {
+        components: { Navbar }
     }
-}
-
 </script>
