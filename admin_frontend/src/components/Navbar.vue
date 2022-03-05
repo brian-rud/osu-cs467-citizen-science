@@ -15,7 +15,7 @@
           <li class="nav-item" v-if="$auth.isAuthenticated.value">
             <router-link class="nav-link" to="/projects" :class="route === '/projects' ? 'active' : ''" :successProjCode="''">Projects</router-link>
           </li>
-          <li class="nav-item">
+          <li class="nav-item" v-if="$auth.isAuthenticated.value">
             <router-link class="nav-link" :class="route === '/new_project' ? 'active' : ''" aria-current="page" to="/new_project">Add Project</router-link>
           </li>
           <li class="ms-auto nav-item dropdown" v-if="$auth.isAuthenticated.value">
