@@ -1,4 +1,4 @@
-import { createStore } from 'vuex'
+import { createStore } from 'vuex';
 
 export default createStore({
   state() {
@@ -9,7 +9,7 @@ export default createStore({
   },
   mutations: {
     setUserId(state, userId){
-      state.userId = userId
+      state.userId = userId;
     },
 
     toggleProjectDetailsChanged(state){

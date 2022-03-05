@@ -4,7 +4,8 @@
 
 <script>
 export default {
-  name: 'Callback',
+  name: "Callback",
+
   created() {
     if (this.$route.query.error) {
       this.$auth.logout({
@@ -12,5 +13,6 @@ export default {
       })
     }
   }
+  
 }
 </script>

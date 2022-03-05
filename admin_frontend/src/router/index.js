@@ -1,13 +1,11 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import Home from '@/views/Home'
-import Projects from '@/views/Projects'
-import NewProject from '@/views/NewProject'
-import SingleProject from '@/views/SingleProject'
-
-import Callback from '@/views/Callback'
-import ErrorPage from '@/views/Error'
-
-import { routeGuard } from '@/auth'
+import { createRouter, createWebHistory } from 'vue-router';
+import Home from '@/views/Home';
+import Projects from '@/views/Projects';
+import NewProject from '@/views/NewProject';
+import SingleProject from '@/views/SingleProject';
+import Callback from '@/views/Callback';
+import ErrorPage from '@/views/Error';
+import { routeGuard } from '@/auth';
 
 const routes = [
   {
@@ -46,11 +44,11 @@ const routes = [
     component: NewProject,
     beforeEnter: routeGuard
   }
-]
+];
 
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes
-})
+});
 
 export default router

@@ -1,19 +1,10 @@
 <template>
   <main-layout>
-     <div class="alert alert-success alert-dismissible fade show" role="alert" v-if="successProjCode">
-      Project created successfully! Here is your access code: <strong>{{ successProjCode }}</strong>
-      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-    <div class="alert alert-success alert-dismissible fade show" role="alert" v-if="successProjDeleteTitle">
-      Project <strong>{{ successProjDeleteTitle }}</strong> successfully deleted!
-      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
     <div class="container">
       <div class="row my-4">
         <div class="col">
           <h1 style="color:#187bcd">Projects</h1>
         </div>
-
       </div>
       <div class="row my-2">
         <div class="col">
@@ -21,9 +12,16 @@
             <button type="button" class="btn btn-primary">Create New Project</button>
           </router-link>
         </div>
-
       </div>
       <hr style="height:3px;color:green"/>
+      <div class="alert alert-success alert-dismissible fade show" role="alert" v-if="successProjCode">
+        Project created successfully! Here is your access code: <strong>{{ successProjCode }}</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+      <div class="alert alert-success alert-dismissible fade show" role="alert" v-if="successProjDeleteTitle">
+        Project <strong>{{ successProjDeleteTitle }}</strong> successfully deleted!
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
       <div class="row row-cols-1 row-cols-4 my-4 g-3">
         <div v-for="project in projects" :key="project.title">
           <div class="col h-100">
@@ -53,10 +51,13 @@ import MainLayout from "@/layouts/MainLayout.vue";
 
 export default {
   name: 'Home',
+
   components: {
     MainLayout
   },
-  props: ['successProjCode', 'successProjDeleteTitle'],
+
+  props: ["successProjCode", "successProjDeleteTitle"],
+
   data(){
     return {
       userId: this.$auth.user.value.sub,
@@ -67,10 +68,13 @@ export default {
 
   mounted(){
     let url = `${process.env.VUE_APP_API_URL}/projects/${this.userId}`;
-    axios.get(url).then((response) => {
-      this.projects = response.data
-    })
+    axios.get(url)
+      .then((response) => {
+        this.projects = response.data;
+      })
+      .catch((error) => {
+        console.log(error);
+      })
   }
-
 }
 </script>
