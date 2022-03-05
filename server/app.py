@@ -25,13 +25,10 @@ from .schemas import *
 
 
 # Catch-all endpoint for serving Vue SPA
-# @app.route('/', defaults={'path': ''})
-# @app.route('/<path:path>')
-@app.route('/', defaults={'path1': '', 'path2': ''})
-@app.route('/<string:path1>')
-@app.route('/<path:path1>', defaults={'path2': ''})
-@app.route('/<path:path1>/<path:path2>')
-def catch_all(path1, path2):
+@app.route('/', defaults={'path': ''})
+# @app.route('/<string:path>')
+@app.route('/<path:path>')
+def catch_all(path):
 
     return app.send_static_file('index.html')
 
