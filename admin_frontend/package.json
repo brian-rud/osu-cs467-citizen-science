@@ -16,7 +16,7 @@
     "axios": "^0.25.0",
     "bootstrap": "^5.1.3",
     "core-js": "^3.6.5",
-    "naive-ui": "^2.25.5",
+    "naive-ui": "^2.26.0",
     "vue": "^3.0.0",
     "vue-router": "^4.0.0-0",
     "vue-step-wizard": "^0.1.17",
