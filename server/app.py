@@ -28,8 +28,7 @@ from .schemas import *
 @app.route('/', defaults={'path': ''})
 @app.route('/<string:path>')
 @app.route('/<path:path>')
-@app.route('/<string:path>/<string:path2>')
-def catch_all(path, path2=None):
+def catch_all(path):
 
     return app.send_static_file('index.html')
 
