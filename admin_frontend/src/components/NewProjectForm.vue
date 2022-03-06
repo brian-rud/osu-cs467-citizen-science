@@ -79,15 +79,15 @@
                     <div class="container">
                         <div class="mb-3">
                             <label for="ivValueMin" class="form-label">Min Independent Variable Value</label>
-                            <input type="text" v-model="ivValues.min" class="form-control" :class="{'is-invalid':!ivValues.min && clickedSubmit}" id="ivValueMin" :required="ivMinMaxSpecify === 'ivMinMax'" placeholder="required">
+                            <input type="number" v-model="ivValues.min" class="form-control" :class="{'is-invalid':!ivValues.min && clickedSubmit}" id="ivValueMin" :required="ivMinMaxSpecify === 'ivMinMax'" placeholder="required">
                         </div>
                         <div class="mb-3">
                             <label for="ivValueMax" class="form-label">Max Independent Variable Value</label>
-                            <input type="text" v-model="ivValues.max" class="form-control" :class="{'is-invalid':!ivValues.max && clickedSubmit}" id="ivValueMax" :required="ivMinMaxSpecify === 'ivMinMax'" placeholder="required">
+                            <input type="number" v-model="ivValues.max" class="form-control" :class="{'is-invalid':!ivValues.max && clickedSubmit}" id="ivValueMax" :required="ivMinMaxSpecify === 'ivMinMax'" placeholder="required">
                         </div>
                         <div class="mb-3">
                             <label for="ivValueIntervalSize" class="form-label">Independent Variable Interval Size</label>
-                            <input type="text" v-model="ivValues.intSize" class="form-control" :class="{'is-invalid':!ivValues.intSize && clickedSubmit}" id="ivValueIntervalSize" :required="ivMinMaxSpecify === 'ivMinMax' " placeholder="required">
+                            <input type="number" v-model="ivValues.intSize" class="form-control" :class="{'is-invalid':!ivValues.intSize && clickedSubmit}" id="ivValueIntervalSize" :required="ivMinMaxSpecify === 'ivMinMax' " placeholder="required">
                         </div>
                     </div>
                 </div>
@@ -95,7 +95,7 @@
                     <div class="container mb-3">
                         <label for="ivValues" class="form-label">Independent Variable Values</label>
                         <div class="input-group mb-3">
-                            <input type="text" v-model="currIvValue" class="form-control" :class="{'is-invalid':ivValues.values.length === 0 && clickedSubmit}" id="ivValues" :placeholder="ivValues.values.length === 0 ? 'Add at least one value' : ''">
+                            <input :type="ivType === 'string' ? 'text' : 'number'" v-model="currIvValue" class="form-control" :class="{'is-invalid':ivValues.values.length === 0 && clickedSubmit}" id="ivValues" :placeholder="ivValues.values.length === 0 ? 'Add at least one value' : ''">
                             <button class="btn btn-primary" @click.prevent="addValue(ivValues.values, currIvValue, 'iv')">Add</button>
                         </div>
                         <div class="container" v-if="ivValues.values.length > 0">
@@ -153,23 +153,23 @@
                     <div class="container">
                         <div class="mb-3">
                             <label for="dvValueMin" class="form-label">Min Dependent Variable Value</label>
-                            <input type="text" v-model="dvValues.min" class="form-control" :class="{'is-invalid':!dvValues.min && clickedSubmit}" id="dvValueMin" :required="dvMinMaxSpecify === 'dvMinMax'" placeholder="required">
+                            <input type="number" v-model="dvValues.min" class="form-control" :class="{'is-invalid':!dvValues.min && clickedSubmit}" id="dvValueMin" :required="dvMinMaxSpecify === 'dvMinMax'" placeholder="required">
                         </div>
                         <div class="mb-3">
                             <label for="dvValueMax" class="form-label">Max Dependent Variable Value</label>
-                            <input type="text" v-model="dvValues.max" class="form-control" :class="{'is-invalid':!dvValues.max && clickedSubmit}" id="dvValueMax" :required="dvMinMaxSpecify === 'dvMinMax'" placeholder="required">
+                            <input type="number" v-model="dvValues.max" class="form-control" :class="{'is-invalid':!dvValues.max && clickedSubmit}" id="dvValueMax" :required="dvMinMaxSpecify === 'dvMinMax'" placeholder="required">
                         </div>
                         <div class="mb-3">
                             <label for="dvValueIntervalSize" class="form-label">Dependent Variable Interval Size</label>
-                            <input type="text" v-model="dvValues.intSize" class="form-control" :class="{'is-invalid':!dvValues.intSize && clickedSubmit}" id="dvValueIntervalSize" :required="dvMinMaxSpecify === 'dvMinMax'" placeholder="required">
+                            <input type="number" v-model="dvValues.intSize" class="form-control" :class="{'is-invalid':!dvValues.intSize && clickedSubmit}" id="dvValueIntervalSize" :required="dvMinMaxSpecify === 'dvMinMax'" placeholder="required">
                         </div>
                     </div>
                 </div>
-                <div v-if="dvMinMaxSpecify === 'dvSpecify' || ivType === 'string'">
+                <div v-if="dvMinMaxSpecify === 'dvSpecify' || dvType === 'string'">
                     <div class=" container mb-3">
                         <label for="dvValues" class="form-label">Dependent Variable Values</label>
                         <div class="input-group mb-3">
-                            <input type="text" v-model="currDvValue" class="form-control" :class="{'is-invalid':dvValues.values.length === 0 && clickedSubmit}" id="dvValues" :required="dvMinMaxSpecify === 'dvSpecify'" :placeholder="dvValues.values.length === 0 ? 'Add at least one value' : ''">
+                            <input :type="dvType === 'string' ? 'text' : 'number'" v-model="currDvValue" class="form-control" :class="{'is-invalid':dvValues.values.length === 0 && clickedSubmit}" id="dvValues" :required="dvMinMaxSpecify === 'dvSpecify'" :placeholder="dvValues.values.length === 0 ? 'Add at least one value' : ''">
                             <button class="btn btn-primary" @click.prevent="addValue(dvValues.values, currDvValue, 'dv')">Add</button>
                         </div>
                         <div class="container" v-if="dvValues.values.length > 0">
@@ -222,8 +222,8 @@
                     values: []
                 },
                 currDvValue: "",
-                ivMinMaxSpecify: "ivMinMax",
-                dvMinMaxSpecify: "dvMinMax",
+                ivMinMaxSpecify: "ivSpecify",
+                dvMinMaxSpecify: "dvSpecify",
                 clickedSubmit: false
             }
         },
@@ -252,6 +252,7 @@
                 else if(this.ivMinMaxSpecify === "ivSpecify"){
                     iv_accepted.values = [...this.ivValues.values];
                 }
+               
                 if(this.dvMinMaxSpecify === "dvMinMax"){
                     dv_accepted.min = this.dvValues.min;
                     dv_accepted.max = this.dvValues.max;
@@ -260,7 +261,7 @@
                 else if(this.dvMinMaxSpecify === "dvSpecify"){
                     dv_accepted.values = [...this.dvValues.values];
                 }
-       
+                
                 let url = `${process.env.VUE_APP_API_URL}/projects/create/${this.$auth.user.value.sub}`;
                 let payload = {
                     title: this.projectTitle,
@@ -277,6 +278,7 @@
                     dv_accepted: dv_accepted,
                     dv_type: this.dvType,
                 };
+              
                 axios.post(url, payload)
                     .then((response) =>  {
                         if(response.status === 200){
@@ -328,4 +330,3 @@
         }
     }
 </script>
-
