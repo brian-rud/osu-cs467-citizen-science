@@ -54,17 +54,9 @@ class IndependentVar {
 
   List<String> get getIVList {
     List<String> tempList = [];
-    String checkerString = '';
-    if (accepted!.containsKey("Values")) {
-      checkerString = "Values";
-    } else {
-      checkerString = type!;
-    }
-    for (int i = 0; i < accepted![checkerString].length; i++) {
-      if (accepted![type][i] == null) {
-        break;
-      } else {
-        tempList.add(accepted![type][i].toString());
+    if (accepted!["values"] != null) {
+      for (int h = 0; h < accepted!["values"].length; h++) {
+        tempList.add(accepted!["values"][h].toString());
       }
     }
     return tempList;
@@ -116,17 +108,9 @@ class DependentVar {
 
   List<String> get getDVList {
     List<String> tempList = [];
-    String checkerString = '';
-    if (accepted!.containsKey("Values")) {
-      checkerString = "Values";
-    } else {
-      checkerString = type!;
-    }
-    for (int j = 0; j < accepted![checkerString].length; j++) {
-      if (accepted![type][j] == null) {
-        break;
-      } else {
-        tempList.add(accepted![type][j].toString());
+    if (accepted!["values"] != null) {
+      for (int h = 0; h < accepted!["values"].length; h++) {
+        tempList.add(accepted!["values"][h].toString());
       }
     }
     return tempList;

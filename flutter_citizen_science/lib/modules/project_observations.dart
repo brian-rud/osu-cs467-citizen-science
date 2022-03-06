@@ -91,10 +91,11 @@ class _ObservationViewState extends State<ObservationView> {
     List posts = [];
     try {
       // This is an open REST API endpoint for testing purposes
-      var url = 'https://cs467-citizen-science.herokuapp.com/field_app/' +
-          widget._currentProject.getProjectObj.getProjectCode +
-          '/' +
-          widget._currentUser.getUserID;
+      var url =
+          'https://cs467-citizen-science-for-kids.herokuapp.com/field_app/' +
+              widget._currentProject.getProjectObj.getProjectCode +
+              '/' +
+              widget._currentUser.getUserID;
 
       final http.Response response = await http.get(Uri.parse(url));
       posts = json.decode(response.body);
@@ -121,7 +122,7 @@ class _ObservationViewState extends State<ObservationView> {
                   onPressed: () async {
                     try {
                       var url =
-                          'https://cs467-citizen-science.herokuapp.com/field_app/' +
+                          'https://cs467-citizen-science-for-kids.herokuapp.com/field_app/' +
                               obsId.toString();
                       await http.delete(Uri.parse(url));
                     } catch (err) {
@@ -162,9 +163,9 @@ class _ObservationViewState extends State<ObservationView> {
                             children: [
                               Padding(
                                 padding: const EdgeInsets.all(10.0),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceAround,
+                                child: Wrap(
+                                  direction: Axis.horizontal,
+                                  alignment: WrapAlignment.center,
                                   children: [
                                     Column(
                                       mainAxisAlignment:
@@ -185,8 +186,14 @@ class _ObservationViewState extends State<ObservationView> {
                                         ),
                                         Text(
                                             snapshot.data![index]['obs_vals']
-                                                    ['iv_val']
-                                                .toString(),
+                                                        ['iv_val']
+                                                    .toString() +
+                                                ' ' +
+                                                widget
+                                                    ._currentProject
+                                                    .getIndependentVar
+                                                    .getIVUnits
+                                                    .toString(),
                                             style: const TextStyle(
                                                 fontSize: 16.0,
                                                 fontWeight: FontWeight.normal))
@@ -210,8 +217,12 @@ class _ObservationViewState extends State<ObservationView> {
                                         ),
                                         Text(
                                             snapshot.data![index]['obs_vals']
-                                                    ['dv_val']
-                                                .toString(),
+                                                        ['dv_val']
+                                                    .toString() +
+                                                ' ' +
+                                                widget._currentProject
+                                                    .getDependentVar.getDVUnits
+                                                    .toString(),
                                             style: const TextStyle(
                                                 fontSize: 16.0,
                                                 fontWeight: FontWeight.normal))

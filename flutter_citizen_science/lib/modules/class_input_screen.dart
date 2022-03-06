@@ -154,7 +154,8 @@ class _ClassCodeInputState extends State<ClassCodeInput> {
     ProjectBundle asyncProject;
     // test code = 2022-1-1
     var url = Uri.parse(
-        'https://cs467-citizen-science.herokuapp.com/field_app/' + projectCode);
+        'https://cs467-citizen-science-for-kids.herokuapp.com/field_app/' +
+            projectCode);
     var response = await http.get(url);
     print('Response status: ${response.statusCode}');
     if (response.statusCode == 200) {
@@ -261,8 +262,7 @@ class _ClassCodeInputState extends State<ClassCodeInput> {
                         UserSpecificObservationsObj(
                             _deviceData['id'] ??
                                 _deviceData['identifierForVendor'],
-                            _asyncProject.getProjectObj.getProjectID,
-                            []);
+                            _asyncProject.getProjectObj.getProjectID);
                     return ClassDetailsScreen(_asyncProject, currentUser);
                   }));
                 }
