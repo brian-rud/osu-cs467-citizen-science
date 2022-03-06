@@ -244,21 +244,21 @@
                     values: null
                 };
 
-                if(this.ivMinMaxSpecify === "ivMinMax"){
+                if(this.ivMinMaxSpecify === "ivMinMax" && this.ivRestricted){
                     iv_accepted.min = this.ivValues.min;
                     iv_accepted.max = this.ivValues.max;
                     iv_accepted.interval_size = this.ivValues.intSize;
                 }
-                else if(this.ivMinMaxSpecify === "ivSpecify"){
+                else if(this.ivMinMaxSpecify === "ivSpecify" && this.ivRestricted){
                     iv_accepted.values = [...this.ivValues.values];
                 }
                
-                if(this.dvMinMaxSpecify === "dvMinMax"){
+                if(this.dvMinMaxSpecify === "dvMinMax" && this.dvRestricted){
                     dv_accepted.min = this.dvValues.min;
                     dv_accepted.max = this.dvValues.max;
                     dv_accepted.interval_size = this.dvValues.intSize;
                 }
-                else if(this.dvMinMaxSpecify === "dvSpecify"){
+                else if(this.dvMinMaxSpecify === "dvSpecify" && this.dvRestricted){
                     dv_accepted.values = [...this.dvValues.values];
                 }
                 
