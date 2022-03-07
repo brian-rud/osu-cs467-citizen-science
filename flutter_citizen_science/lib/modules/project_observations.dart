@@ -142,130 +142,137 @@ class _ObservationViewState extends State<ObservationView> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(10),
-      child: Expanded(
-        child: FutureBuilder(
-            future: _loadData(),
-            builder: (BuildContext ctx, AsyncSnapshot<List> snapshot) =>
-                snapshot.hasData
-                    ? ListView.builder(
-                        itemCount: snapshot.data!.length,
-                        itemBuilder: (BuildContext context, index) => Card(
-                          shape: const RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10.0))),
-                          margin: const EdgeInsets.all(10),
-                          child: Column(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.all(10.0),
-                                child: Wrap(
-                                  direction: Axis.horizontal,
-                                  alignment: WrapAlignment.center,
-                                  children: [
-                                    Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Text(
-                                            widget
-                                                    ._currentProject
-                                                    .getIndependentVar
-                                                    .getIVName ??
-                                                "IV",
-                                            style: const TextStyle(
-                                                fontSize: 18.0,
-                                                fontWeight: FontWeight.w500),
-                                          ),
-                                        ),
-                                        Text(
-                                            snapshot.data![index]['obs_vals']
-                                                        ['iv_val']
-                                                    .toString() +
-                                                ' ' +
-                                                widget
-                                                    ._currentProject
-                                                    .getIndependentVar
-                                                    .getIVUnits
-                                                    .toString(),
-                                            style: const TextStyle(
-                                                fontSize: 16.0,
-                                                fontWeight: FontWeight.normal))
-                                      ],
-                                    ),
-                                    Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Text(
+    return Flex(
+      direction: Axis.vertical,
+      children: [
+        Expanded(
+          child: FutureBuilder(
+              future: _loadData(),
+              builder: (BuildContext ctx, AsyncSnapshot<List> snapshot) =>
+                  snapshot.hasData
+                      ? ListView.builder(
+                          itemCount: snapshot.data!.length,
+                          itemBuilder: (BuildContext context, index) => Card(
+                            shape: const RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10.0))),
+                            margin: const EdgeInsets.all(10),
+                            child: Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(10.0),
+                                  child: Wrap(
+                                    direction: Axis.horizontal,
+                                    alignment: WrapAlignment.center,
+                                    children: [
+                                      Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Text(
                                               widget
                                                       ._currentProject
-                                                      .getDependentVar
-                                                      .getDVName ??
-                                                  "DV",
+                                                      .getIndependentVar
+                                                      .getIVName ??
+                                                  "IV",
                                               style: const TextStyle(
                                                   fontSize: 18.0,
-                                                  fontWeight: FontWeight.w500)),
-                                        ),
-                                        Text(
-                                            snapshot.data![index]['obs_vals']
-                                                        ['dv_val']
-                                                    .toString() +
-                                                ' ' +
-                                                widget._currentProject
-                                                    .getDependentVar.getDVUnits
-                                                    .toString(),
-                                            style: const TextStyle(
-                                                fontSize: 16.0,
-                                                fontWeight: FontWeight.normal))
-                                      ],
-                                    ),
-                                  ],
+                                                  fontWeight: FontWeight.w500),
+                                            ),
+                                          ),
+                                          Text(
+                                              snapshot.data![index]['obs_vals']
+                                                          ['iv_val']
+                                                      .toString() +
+                                                  ' ' +
+                                                  widget
+                                                      ._currentProject
+                                                      .getIndependentVar
+                                                      .getIVUnits
+                                                      .toString(),
+                                              style: const TextStyle(
+                                                  fontSize: 16.0,
+                                                  fontWeight:
+                                                      FontWeight.normal))
+                                        ],
+                                      ),
+                                      Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Text(
+                                                widget
+                                                        ._currentProject
+                                                        .getDependentVar
+                                                        .getDVName ??
+                                                    "DV",
+                                                style: const TextStyle(
+                                                    fontSize: 18.0,
+                                                    fontWeight:
+                                                        FontWeight.w500)),
+                                          ),
+                                          Text(
+                                              snapshot.data![index]['obs_vals']
+                                                          ['dv_val']
+                                                      .toString() +
+                                                  ' ' +
+                                                  widget
+                                                      ._currentProject
+                                                      .getDependentVar
+                                                      .getDVUnits
+                                                      .toString(),
+                                              style: const TextStyle(
+                                                  fontSize: 16.0,
+                                                  fontWeight:
+                                                      FontWeight.normal))
+                                        ],
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
-                                children: [
-                                  TextButton(
-                                      onPressed: () {
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  CreateObservationScreen(
-                                                widget._currentProject,
-                                                widget._currentUser,
-                                                isEditing: true,
-                                                editObsID: snapshot.data![index]
-                                                    ['obs_id'],
-                                              ),
-                                            )).then((value) {
-                                          setState(() {});
-                                        });
-                                      },
-                                      child: const Text('EDIT')),
-                                  TextButton(
-                                      onPressed: () {
-                                        _deleteObservation(
-                                            snapshot.data![index]['obs_id']);
-                                      },
-                                      child: const Text('DELETE'))
-                                ],
-                              )
-                            ],
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
+                                  children: [
+                                    TextButton(
+                                        onPressed: () {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    CreateObservationScreen(
+                                                  widget._currentProject,
+                                                  widget._currentUser,
+                                                  isEditing: true,
+                                                  editObsID: snapshot
+                                                      .data![index]['obs_id'],
+                                                ),
+                                              )).then((value) {
+                                            setState(() {});
+                                          });
+                                        },
+                                        child: const Text('EDIT')),
+                                    TextButton(
+                                        onPressed: () {
+                                          _deleteObservation(
+                                              snapshot.data![index]['obs_id']);
+                                        },
+                                        child: const Text('DELETE'))
+                                  ],
+                                )
+                              ],
+                            ),
                           ),
-                        ),
-                      )
-                    : const Center(
-                        child: CircularProgressIndicator(),
-                      )),
-      ),
+                        )
+                      : const Center(
+                          child: CircularProgressIndicator(),
+                        )),
+        ),
+      ],
 
       /*
         ListView.builder(
