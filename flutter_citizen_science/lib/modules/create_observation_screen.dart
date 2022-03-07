@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_citizen_science/modules/variables.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_citizen_science/modules/project_observations.dart';
 import 'package:flutter_citizen_science/modules/user_observations_obj.dart';
 import 'project_bundle.dart';
 

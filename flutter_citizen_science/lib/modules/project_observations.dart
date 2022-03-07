@@ -1,12 +1,9 @@
 import 'dart:convert';
-import 'dart:ffi';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_citizen_science/modules/class_details.dart';
 import 'package:flutter_citizen_science/modules/create_observation_screen.dart';
 import 'package:flutter_citizen_science/modules/project_bundle.dart';
 import 'package:flutter_citizen_science/modules/user_observations_obj.dart';
-import 'project_obj.dart';
 import 'create_observation_screen.dart';
 
 // observations page
