@@ -24,7 +24,7 @@
             <div class="mb-3">
                 <label for="projectPrompt" class="form-label">Project Prompt</label>
                 <input type="text" class="form-control" :class="{'is-invalid': !projectPrompt && clickedSubmit}" v-model="projectPrompt" id="projectPrompt" placeholder="required" required>
-                <div id="projPromptHelp" class="form-text">Prompt dispayed to students entering obervations e.g. Enter time and temperature readings.</div>
+                <div id="projPromptHelp" class="form-text">Prompt displayed to students entering observations e.g. Enter time and temperature readings.</div>
             </div>
                 <div class="mb-3">
                 <label for="endDate" class="form-label">End Date</label>
@@ -180,7 +180,7 @@
             </div>
         </div>
         <hr style="height:3px;color:green"/>
-        <div class="d-flex justify-content-end">
+        <div class="d-flex justify-content-end mb-3">
             <button type="submit" class="btn btn-primary" @click="submit">Create Project</button>
         </div>
     </form>
