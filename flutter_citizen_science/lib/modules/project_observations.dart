@@ -1,12 +1,9 @@
 import 'dart:convert';
-import 'dart:ffi';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_citizen_science/modules/class_details.dart';
 import 'package:flutter_citizen_science/modules/create_observation_screen.dart';
 import 'package:flutter_citizen_science/modules/project_bundle.dart';
 import 'package:flutter_citizen_science/modules/user_observations_obj.dart';
-import 'project_obj.dart';
 import 'create_observation_screen.dart';
 
 // observations page
@@ -91,10 +88,11 @@ class _ObservationViewState extends State<ObservationView> {
     List posts = [];
     try {
       // This is an open REST API endpoint for testing purposes
-      var url = 'https://cs467-citizen-science.herokuapp.com/field_app/' +
-          widget._currentProject.getProjectObj.getProjectCode +
-          '/' +
-          widget._currentUser.getUserID;
+      var url =
+          'https://cs467-citizen-science-for-kids.herokuapp.com/field_app/' +
+              widget._currentProject.getProjectObj.getProjectCode +
+              '/' +
+              widget._currentUser.getUserID;
 
       final http.Response response = await http.get(Uri.parse(url));
       posts = json.decode(response.body);
@@ -121,7 +119,7 @@ class _ObservationViewState extends State<ObservationView> {
                   onPressed: () async {
                     try {
                       var url =
-                          'https://cs467-citizen-science.herokuapp.com/field_app/' +
+                          'https://cs467-citizen-science-for-kids.herokuapp.com/field_app/' +
                               obsId.toString();
                       await http.delete(Uri.parse(url));
                     } catch (err) {
@@ -144,120 +142,137 @@ class _ObservationViewState extends State<ObservationView> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(10),
-      child: Expanded(
-        child: FutureBuilder(
-            future: _loadData(),
-            builder: (BuildContext ctx, AsyncSnapshot<List> snapshot) =>
-                snapshot.hasData
-                    ? ListView.builder(
-                        itemCount: snapshot.data!.length,
-                        itemBuilder: (BuildContext context, index) => Card(
-                          shape: const RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10.0))),
-                          margin: const EdgeInsets.all(10),
-                          child: Column(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.all(10.0),
-                                child: Row(
+    return Flex(
+      direction: Axis.vertical,
+      children: [
+        Expanded(
+          child: FutureBuilder(
+              future: _loadData(),
+              builder: (BuildContext ctx, AsyncSnapshot<List> snapshot) =>
+                  snapshot.hasData
+                      ? ListView.builder(
+                          itemCount: snapshot.data!.length,
+                          itemBuilder: (BuildContext context, index) => Card(
+                            shape: const RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10.0))),
+                            margin: const EdgeInsets.all(10),
+                            child: Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(10.0),
+                                  child: Wrap(
+                                    direction: Axis.horizontal,
+                                    alignment: WrapAlignment.center,
+                                    children: [
+                                      Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Text(
+                                              widget
+                                                      ._currentProject
+                                                      .getIndependentVar
+                                                      .getIVName ??
+                                                  "IV",
+                                              style: const TextStyle(
+                                                  fontSize: 18.0,
+                                                  fontWeight: FontWeight.w500),
+                                            ),
+                                          ),
+                                          Text(
+                                              snapshot.data![index]['obs_vals']
+                                                          ['iv_val']
+                                                      .toString() +
+                                                  ' ' +
+                                                  widget
+                                                      ._currentProject
+                                                      .getIndependentVar
+                                                      .getIVUnits
+                                                      .toString(),
+                                              style: const TextStyle(
+                                                  fontSize: 16.0,
+                                                  fontWeight:
+                                                      FontWeight.normal))
+                                        ],
+                                      ),
+                                      Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Text(
+                                                widget
+                                                        ._currentProject
+                                                        .getDependentVar
+                                                        .getDVName ??
+                                                    "DV",
+                                                style: const TextStyle(
+                                                    fontSize: 18.0,
+                                                    fontWeight:
+                                                        FontWeight.w500)),
+                                          ),
+                                          Text(
+                                              snapshot.data![index]['obs_vals']
+                                                          ['dv_val']
+                                                      .toString() +
+                                                  ' ' +
+                                                  widget
+                                                      ._currentProject
+                                                      .getDependentVar
+                                                      .getDVUnits
+                                                      .toString(),
+                                              style: const TextStyle(
+                                                  fontSize: 16.0,
+                                                  fontWeight:
+                                                      FontWeight.normal))
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceAround,
                                   children: [
-                                    Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Text(
-                                            widget
-                                                    ._currentProject
-                                                    .getIndependentVar
-                                                    .getIVName ??
-                                                "IV",
-                                            style: const TextStyle(
-                                                fontSize: 18.0,
-                                                fontWeight: FontWeight.w500),
-                                          ),
-                                        ),
-                                        Text(
-                                            snapshot.data![index]['obs_vals']
-                                                    ['iv_val']
-                                                .toString(),
-                                            style: const TextStyle(
-                                                fontSize: 16.0,
-                                                fontWeight: FontWeight.normal))
-                                      ],
-                                    ),
-                                    Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Text(
-                                              widget
-                                                      ._currentProject
-                                                      .getDependentVar
-                                                      .getDVName ??
-                                                  "DV",
-                                              style: const TextStyle(
-                                                  fontSize: 18.0,
-                                                  fontWeight: FontWeight.w500)),
-                                        ),
-                                        Text(
-                                            snapshot.data![index]['obs_vals']
-                                                    ['dv_val']
-                                                .toString(),
-                                            style: const TextStyle(
-                                                fontSize: 16.0,
-                                                fontWeight: FontWeight.normal))
-                                      ],
-                                    ),
+                                    TextButton(
+                                        onPressed: () {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    CreateObservationScreen(
+                                                  widget._currentProject,
+                                                  widget._currentUser,
+                                                  isEditing: true,
+                                                  editObsID: snapshot
+                                                      .data![index]['obs_id'],
+                                                ),
+                                              )).then((value) {
+                                            setState(() {});
+                                          });
+                                        },
+                                        child: const Text('EDIT')),
+                                    TextButton(
+                                        onPressed: () {
+                                          _deleteObservation(
+                                              snapshot.data![index]['obs_id']);
+                                        },
+                                        child: const Text('DELETE'))
                                   ],
-                                ),
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
-                                children: [
-                                  TextButton(
-                                      onPressed: () {
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  CreateObservationScreen(
-                                                widget._currentProject,
-                                                widget._currentUser,
-                                                isEditing: true,
-                                                editObsID: snapshot.data![index]
-                                                    ['obs_id'],
-                                              ),
-                                            )).then((value) {
-                                          setState(() {});
-                                        });
-                                      },
-                                      child: const Text('EDIT')),
-                                  TextButton(
-                                      onPressed: () {
-                                        _deleteObservation(
-                                            snapshot.data![index]['obs_id']);
-                                      },
-                                      child: const Text('DELETE'))
-                                ],
-                              )
-                            ],
+                                )
+                              ],
+                            ),
                           ),
-                        ),
-                      )
-                    : const Center(
-                        child: CircularProgressIndicator(),
-                      )),
-      ),
+                        )
+                      : const Center(
+                          child: CircularProgressIndicator(),
+                        )),
+        ),
+      ],
 
       /*
         ListView.builder(

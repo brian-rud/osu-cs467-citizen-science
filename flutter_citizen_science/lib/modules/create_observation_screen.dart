@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_citizen_science/modules/variables.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_citizen_science/modules/project_observations.dart';
 import 'package:flutter_citizen_science/modules/user_observations_obj.dart';
 import 'project_bundle.dart';
 
@@ -115,6 +114,46 @@ class _ObservationFormBodyState extends State<ObservationFormBody> {
     return double.tryParse(s) != null;
   }
 
+  List<double> sliderFormatter(int max, int min, int intVal) {
+    // List[0] = double max, List[1] = double min, List[2] = double interval
+    //(complete double to int inline)
+    List<double> sliderFormatted = [];
+    // check if divisible
+    if (intVal != 0 && intVal != 1) {
+      int newMax = max;
+      while ((newMax - min) % intVal != 0) {
+        newMax = newMax + 1;
+      }
+      sliderFormatted.add(newMax.toDouble());
+    } else {
+      sliderFormatted.add(max.toDouble());
+    }
+    sliderFormatted.add(min.toDouble());
+    if (intVal == 0 || intVal == 1) {
+      sliderFormatted.add(sliderFormatted[0] - sliderFormatted[1]);
+    } else {
+      sliderFormatted.add((sliderFormatted[0] - sliderFormatted[1]) / intVal);
+    }
+    return sliderFormatted;
+  }
+
+  String labelSliderFormatter(double value, int max, double newMax) {
+    if (value == newMax) {
+      double convertedmax = max.toDouble();
+      return convertedmax.toString();
+    } else {
+      return value.toString();
+    }
+  }
+
+  double valueSliderFormatter(double value, int max, double newMax) {
+    if (value == newMax) {
+      return max.toDouble();
+    } else {
+      return value;
+    }
+  }
+
   Future<void> _submitObservation(ivVal, dvVal) async {
     String submissionMessage = 'Default Response';
     var ivBodyObj;
@@ -130,10 +169,11 @@ class _ObservationFormBodyState extends State<ObservationFormBody> {
       dvBodyObj = dvVal as String;
     }
     try {
-      var url = 'https://cs467-citizen-science.herokuapp.com/field_app/' +
-          widget.currentProject.getProjectObj.getProjectCode +
-          '/' +
-          widget.currentUser.getUserID;
+      var url =
+          'https://cs467-citizen-science-for-kids.herokuapp.com/field_app/' +
+              widget.currentProject.getProjectObj.getProjectCode +
+              '/' +
+              widget.currentUser.getUserID;
       Map<String, dynamic> encodingBody = {
         "obs_vals": {"iv_val": ivBodyObj, "dv_val": dvBodyObj},
       };
@@ -185,8 +225,9 @@ class _ObservationFormBodyState extends State<ObservationFormBody> {
       dvBodyObj = dvVal as String;
     }
     try {
-      var url = 'https://cs467-citizen-science.herokuapp.com/field_app/' +
-          obsID.toString();
+      var url =
+          'https://cs467-citizen-science-for-kids.herokuapp.com/field_app/' +
+              obsID.toString();
       Map<String, dynamic> encodingBody = {
         "obs_vals": {"iv_val": ivBodyObj, "dv_val": dvBodyObj},
       };
@@ -222,12 +263,20 @@ class _ObservationFormBodyState extends State<ObservationFormBody> {
     // create column widget
     List<Widget> columnList = [];
     // add prompt
-    columnList.add(Padding(
-      padding: const EdgeInsets.fromLTRB(0, 10.0, 0, 10.0),
-      child: Text(
-        widget.currentProject.getProjectObj.getProjectPrompt,
-        style: const TextStyle(
-            fontWeight: FontWeight.w600, fontSize: 22.0, color: Colors.blue),
+    columnList.add(Align(
+      alignment: Alignment.center,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(0, 10.0, 0, 10.0),
+        child: Center(
+          child: Text(
+            widget.currentProject.getProjectObj.getProjectPrompt,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 22.0,
+                color: Colors.blue),
+          ),
+        ),
       ),
     ));
     // method configures form for observation submission
@@ -238,25 +287,29 @@ class _ObservationFormBodyState extends State<ObservationFormBody> {
       columnList.add(const Text('No DV'));
     }
     // configure IV
-    columnList.add(Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Text(
-          widget.currentProject.getIndependentVar.getIVName ?? "IV",
-          style: const TextStyle(
-              fontWeight: FontWeight.w600, fontSize: 20.0, color: Colors.blue),
-        )));
-    if (iv.getIVType == "String") {
+    columnList.add(Container(
+      alignment: Alignment.center,
+      child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(
+            widget.currentProject.getIndependentVar.getIVName ?? "IV",
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 20.0,
+                color: Colors.blue),
+          )),
+    ));
+    if (iv.getIVType == "string") {
       // REPLACE WITH VALUES AFTER
       if (iv.getIVList.isNotEmpty) {
         // create dropdown
-        columnList.add(const Text('String Dropdown'));
         columnList.add(SelectionDropdown(
           stringList: iv.getIVList,
           val: changeIVValue,
         ));
       } else {
         // create text input
-        columnList.add(const Text('String Text Input'));
         columnList.add(
           TextFormField(
             controller: ivTextController,
@@ -272,82 +325,106 @@ class _ObservationFormBodyState extends State<ObservationFormBody> {
           ),
         );
       }
-    } else if (iv.getIVType == "Num") {
+      columnList.add(Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Text(
+          widget.currentProject.getIndependentVar.getIVUnits.toString(),
+          textAlign: TextAlign.center,
+          style: const TextStyle(color: Colors.blueAccent, fontSize: 14.0),
+        ),
+      ));
+    } else if (iv.getIVType == "number") {
       if (iv.getIVList.isNotEmpty) {
         // create dropdown
-        columnList.add(const Text('Num Dropdown'));
         columnList.add(SelectionDropdown(
           stringList: iv.getIVList,
           val: changeIVValue,
         ));
+        columnList.add(Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(
+            widget.currentProject.getIndependentVar.getIVUnits.toString(),
+            textAlign: TextAlign.center,
+            style: const TextStyle(color: Colors.blueAccent, fontSize: 14.0),
+          ),
+        ));
+      } else if (iv.accepted!["interval_size"] != null ||
+          iv.accepted!["min"] != null ||
+          iv.accepted!["max"] != null) {
+        // create slider
+        List<double> ivSliderList = sliderFormatter(iv.accepted!["max"],
+            iv.accepted!["min"], iv.accepted!["interval_size"]);
+        columnList.add(Slider(
+          value: ivSliderValue,
+          min: ivSliderList[1],
+          max: ivSliderList[0],
+          divisions: ivSliderList[2].toInt(),
+          label: labelSliderFormatter(
+                  ivSliderValue, iv.accepted!["max"], ivSliderList[0]) +
+              ' ' +
+              widget.currentProject.getIndependentVar.getIVUnits.toString(),
+          onChanged: (double value) {
+            setState(() {
+              ivSliderValue = valueSliderFormatter(
+                  value, iv.accepted!["max"], ivSliderList[0]);
+              changeIVValue(ivSliderValue.toString());
+            });
+          },
+        ));
       } else {
-        if (iv.accepted!.containsKey("interval_size") ||
-            iv.accepted!.containsKey("min") ||
-            iv.accepted!.containsKey("max")) {
-          // create slider
-          columnList.add(const Text('Num Slider'));
-          columnList.add(Slider(
-            value: ivSliderValue,
-            min: iv.accepted!["min"],
-            max: iv.accepted!["max"],
-            divisions: iv.accepted!["interval_size"],
-            label: ivSliderValue.round().toString(),
-            onChanged: (double value) {
-              setState(() {
-                ivSliderValue = value;
-                changeIVValue(ivSliderValue.toString());
-              });
+        // create number input without validation
+        columnList.add(
+          TextFormField(
+            controller: ivTextController,
+            decoration: const InputDecoration(border: OutlineInputBorder()),
+            // The validator receives the text that the user has entered.
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter a number';
+              }
+              if (isNumeric(value) == false) {
+                return 'Please enter a valid number';
+              }
+              changeIVValue(ivTextController.text);
+              return null;
             },
-          ));
-        } else {
-          // create number input without validation
-          columnList.add(const Text('Num input'));
-          columnList.add(
-            TextFormField(
-              controller: ivTextController,
-              decoration: const InputDecoration(border: OutlineInputBorder()),
-              // The validator receives the text that the user has entered.
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter a number';
-                }
-                changeIVValue(ivTextController.text);
-                return null;
-              },
-            ),
-          );
-        }
-      }
-    } else if (iv.getIVType == "Date") {
-      if (iv.accepted!.containsKey("min") && iv.accepted!.containsKey("max")) {
-        // date input with validation
-        columnList.add(const Text('Date input with validation'));
-      } else {
-        // date input without validation
-        columnList.add(const Text('Date input without validation'));
+          ),
+        );
+        columnList.add(Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(
+            widget.currentProject.getIndependentVar.getIVUnits.toString(),
+            textAlign: TextAlign.center,
+            style: const TextStyle(color: Colors.blueAccent, fontSize: 14.0),
+          ),
+        ));
       }
     }
     columnList.add(const Padding(padding: EdgeInsets.fromLTRB(0, 5.0, 0, 5.0)));
-    columnList.add(Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Text(
-          widget.currentProject.getDependentVar.getDVName ?? "DV",
-          style: const TextStyle(
-              fontWeight: FontWeight.w600, fontSize: 20.0, color: Colors.blue),
-        )));
+    columnList.add(Container(
+      alignment: Alignment.center,
+      child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(
+            widget.currentProject.getDependentVar.getDVName ?? "DV",
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 20.0,
+                color: Colors.blue),
+          )),
+    ));
     // configure DV
-    if (dv.getDVType == "String") {
+    if (dv.getDVType == "string") {
       // REPLACE WITH VALUES AFTER
       if (dv.getDVList.isNotEmpty) {
         // create dropdown
-        columnList.add(const Text('String Dropdown'));
         columnList.add(SelectionDropdown(
           stringList: dv.getDVList,
           val: changeDVValue,
         ));
       } else {
         // create text input
-        columnList.add(const Text('String Text Input'));
         columnList.add(
           TextFormField(
             controller: dvTextController,
@@ -363,59 +440,79 @@ class _ObservationFormBodyState extends State<ObservationFormBody> {
           ),
         );
       }
-    } else if (dv.getDVType == "Num") {
+      columnList.add(Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Text(
+          widget.currentProject.getDependentVar.getDVUnits.toString(),
+          textAlign: TextAlign.center,
+          style: const TextStyle(color: Colors.blueAccent, fontSize: 14.0),
+        ),
+      ));
+    } else if (dv.getDVType == "number") {
       if (dv.getDVList.isNotEmpty) {
         // create dropdown
-        columnList.add(const Text('Num Dropdown'));
         columnList.add(SelectionDropdown(
           stringList: dv.getDVList,
           val: changeDVValue,
         ));
+        columnList.add(Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(
+            widget.currentProject.getDependentVar.getDVUnits.toString(),
+            textAlign: TextAlign.center,
+            style: const TextStyle(color: Colors.blueAccent, fontSize: 14.0),
+          ),
+        ));
+      } else if (dv.accepted!["interval_size"] != null ||
+          dv.accepted!["min"] != null ||
+          dv.accepted!["max"] != null) {
+        // create slider
+        List<double> dvSliderList = sliderFormatter(dv.accepted!["max"],
+            dv.accepted!["min"], dv.accepted!["interval_size"]);
+        columnList.add(Slider(
+          value: dvSliderValue,
+          min: dvSliderList[1],
+          max: dvSliderList[0],
+          divisions: dvSliderList[2].toInt(),
+          label: labelSliderFormatter(
+                  dvSliderValue, dv.accepted!["max"], dvSliderList[0]) +
+              ' ' +
+              widget.currentProject.dependentVar.getDVUnits.toString(),
+          onChanged: (double value) {
+            setState(() {
+              dvSliderValue = valueSliderFormatter(
+                  value, dv.accepted!["max"], dvSliderList[0]);
+              changeDVValue(dvSliderValue.toString());
+            });
+          },
+        ));
       } else {
-        if (dv.accepted!.containsKey("interval_size") ||
-            dv.accepted!.containsKey("min") ||
-            dv.accepted!.containsKey("max")) {
-          // create slider
-          columnList.add(const Text('Num Slider'));
-          columnList.add(Slider(
-            value: dvSliderValue,
-            min: dv.accepted!["min"],
-            max: dv.accepted!["max"],
-            divisions: dv.accepted!["interval_size"],
-            label: dvSliderValue.round().toString(),
-            onChanged: (double value) {
-              setState(() {
-                dvSliderValue = value;
-                changeDVValue(dvSliderValue.toString());
-              });
+        // create number input without validation
+        columnList.add(
+          TextFormField(
+            controller: dvTextController,
+            decoration: const InputDecoration(border: OutlineInputBorder()),
+            // The validator receives the text that the user has entered.
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter a number';
+              }
+              if (isNumeric(value) == false) {
+                return 'Please enter a valid number';
+              }
+              changeDVValue(dvTextController.text);
+              return null;
             },
-          ));
-        } else {
-          // create number input without validation
-          columnList.add(const Text('Num input'));
-          columnList.add(
-            TextFormField(
-              controller: dvTextController,
-              decoration: const InputDecoration(border: OutlineInputBorder()),
-              // The validator receives the text that the user has entered.
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter a number';
-                }
-                changeDVValue(dvTextController.text);
-                return null;
-              },
-            ),
-          );
-        }
-      }
-    } else if (dv.getDVType == "Date") {
-      if (dv.accepted!.containsKey("min") && dv.accepted!.containsKey("max")) {
-        // date input with validation
-        columnList.add(const Text('Date input with validation'));
-      } else {
-        // date input without validation
-        columnList.add(const Text('Date input without validation'));
+          ),
+        );
+        columnList.add(Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(
+            widget.currentProject.getDependentVar.getDVUnits.toString(),
+            textAlign: TextAlign.center,
+            style: const TextStyle(color: Colors.blueAccent, fontSize: 14.0),
+          ),
+        ));
       }
     }
     columnList.add(Padding(
@@ -450,9 +547,8 @@ class _ObservationFormBodyState extends State<ObservationFormBody> {
     ));
     return Form(
         key: formKey,
-        child: Column(
+        child: ListView(
           children: columnList,
-          mainAxisAlignment: MainAxisAlignment.center,
         ));
   }
 
@@ -464,6 +560,14 @@ class _ObservationFormBodyState extends State<ObservationFormBody> {
     }
     if (widget.currentProject.getDependentVar.getDVList.isNotEmpty) {
       dvVal = widget.currentProject.getDependentVar.getDVList[0];
+    }
+    if (widget.currentProject.getIndependentVar.accepted!["min"] != null) {
+      ivSliderValue =
+          widget.currentProject.getIndependentVar.accepted!["min"].toDouble();
+    }
+    if (widget.currentProject.getDependentVar.accepted!["min"] != null) {
+      dvSliderValue =
+          widget.currentProject.getDependentVar.accepted!["min"].toDouble();
     }
   }
 
@@ -515,9 +619,12 @@ class _SelectionDropdownState extends State<SelectionDropdown> {
   @override
   Widget build(BuildContext context) {
     return DropdownButton<String>(
+      isExpanded: true,
       value: dropdownValue,
       icon: const Icon(Icons.arrow_downward),
       elevation: 16,
+      alignment: Alignment.center,
+      borderRadius: const BorderRadius.all(Radius.circular(10)),
       style: const TextStyle(
         fontSize: 20.0,
         color: Colors.blue,
@@ -535,7 +642,11 @@ class _SelectionDropdownState extends State<SelectionDropdown> {
       items: widget.stringList.map<DropdownMenuItem<String>>((String value) {
         return DropdownMenuItem<String>(
           value: value,
-          child: Text(value),
+          child: Text(
+            value,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+          ),
         );
       }).toList(),
     );

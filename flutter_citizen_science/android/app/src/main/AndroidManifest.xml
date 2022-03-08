@@ -1,7 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.flutter_citizen_science">
+    
+    <uses-permission android:name="android.permission.INTERNET" />
+
    <application
-        android:label="flutter_citizen_science"
+        android:label="Citizen_Science"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

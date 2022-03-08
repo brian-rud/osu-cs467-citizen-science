@@ -3,10 +3,8 @@
 class UserSpecificObservationsObj {
   String? userID;
   int? projectID;
-  late List<Observation> observationsArray;
 
-  UserSpecificObservationsObj(
-      this.userID, this.projectID, this.observationsArray);
+  UserSpecificObservationsObj(this.userID, this.projectID);
 
   String get getUserID {
     return '$userID';
@@ -14,26 +12,5 @@ class UserSpecificObservationsObj {
 
   int? get getProjectID {
     return projectID;
-  }
-
-  List<Observation> get getObservationsArray {
-    return observationsArray;
-  }
-}
-
-// observations object
-
-class Observation {
-  int observationID;
-  String? observationName;
-
-  Observation(this.observationID, this.observationName);
-
-  int? get getObservationID {
-    return observationID;
-  }
-
-  String get getObservationName {
-    return '$observationName';
   }
 }

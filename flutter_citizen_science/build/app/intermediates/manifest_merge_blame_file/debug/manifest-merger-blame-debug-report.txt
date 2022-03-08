@@ -12,8 +12,8 @@
 12         to allow setting breakpoints, to provide hot reload, etc.
 13    -->
 14    <uses-permission android:name="android.permission.INTERNET" />
-14-->C:\Users\bftw2\Documents\osu-cs467-citizen-science\flutter_citizen_science\android\app\src\debug\AndroidManifest.xml:6:5-66
-14-->C:\Users\bftw2\Documents\osu-cs467-citizen-science\flutter_citizen_science\android\app\src\debug\AndroidManifest.xml:6:22-64
+14-->C:\Users\bftw2\FlutterProjects\osu-cs467-citizen-science\flutter_citizen_science\android\app\src\main\AndroidManifest.xml:4:5-67
+14-->C:\Users\bftw2\FlutterProjects\osu-cs467-citizen-science\flutter_citizen_science\android\app\src\main\AndroidManifest.xml:4:22-64
 15
 16    <application
 17        android:name="android.app.Application"
@@ -21,7 +21,7 @@
 18-->[androidx.core:core:1.6.0] C:\Users\bftw2\.gradle\caches\transforms-2\files-2.1\5f663b08eec19eef9a9d1af662d9025e\core-1.6.0\AndroidManifest.xml:24:18-86
 19        android:debuggable="true"
 20        android:icon="@mipmap/ic_launcher"
-21        android:label="flutter_citizen_science" >
+21        android:label="Citizen_Science" >
 22        <activity
 23            android:name="com.example.flutter_citizen_science.MainActivity"
 24            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
